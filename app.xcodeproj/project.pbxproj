@@ -79,6 +79,7 @@
 		DF5989ED306897E400D49FD8 /* LumiWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LumiWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DF5989FC306897E500D49FD8 /* LumiWatch Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "LumiWatch Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DF598A06306897E500D49FD8 /* LumiWatch Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "LumiWatch Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DF598B383068E6F300D49FD8 /* LumiWatch-Watch-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "LumiWatch-Watch-App-Info.plist"; sourceTree = "<group>"; };
 		DF8AD49930687E3800A54CF3 /* app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = app.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DF8AD4AA30687E3A00A54CF3 /* appTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = appTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DF8AD4B430687E3A00A54CF3 /* appUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = appUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -182,6 +183,7 @@
 		DF8AD49030687E3800A54CF3 = {
 			isa = PBXGroup;
 			children = (
+				DF598B383068E6F300D49FD8 /* LumiWatch-Watch-App-Info.plist */,
 				DF8AD49B30687E3800A54CF3 /* app */,
 				DF8AD4AD30687E3A00A54CF3 /* appTests */,
 				DF8AD4B730687E3A00A54CF3 /* appUITests */,
@@ -574,6 +576,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "LumiWatch-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Lumi;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = heylumipet.app;
@@ -607,6 +610,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "LumiWatch-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Lumi;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = heylumipet.app;

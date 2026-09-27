@@ -12,10 +12,11 @@ import LumiPersistence
 
 enum AppDependencies {
     /// Builds a SwiftData-backed repository. Pass `inMemory: true` for previews,
-    /// tests, and UI tests. CloudKit is disabled for now (enabled in a later task).
+    /// tests, and UI tests. Production launches sync through the private CloudKit
+    /// database and fall back to a local-only store if CloudKit is unavailable.
     static func make(inMemory: Bool = false) throws -> any PetRepository {
-        let container = try LumiModelContainerFactory.make(inMemory: inMemory, cloudKit: false)
-        return SwiftDataPetRepository(container: container)
+        let store = try LumiModelContainerFactory.makeSyncedStore(inMemory: inMemory)
+        return SwiftDataPetRepository(container: store.container)
     }
 }
 

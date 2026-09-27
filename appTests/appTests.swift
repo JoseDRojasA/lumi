@@ -82,6 +82,7 @@ struct LumiViewModelTests {
     }
 }
 
+@MainActor
 struct AppDependenciesTests {
     @Test func inMemoryDependenciesCreateAndReuseOnePet() async throws {
         let repository = try AppDependencies.make(inMemory: true)

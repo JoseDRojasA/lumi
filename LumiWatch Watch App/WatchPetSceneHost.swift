@@ -1,9 +1,11 @@
 //
-//  PetSceneHost.swift
-//  app
+//  WatchPetSceneHost.swift
+//  LumiWatch Watch App
 //
-//  Hosts a PetScene for a single Lumi, wiring size → policy, lifecycle,
-//  scene phase, reduce-motion, and accessibility.
+//  Hosts a PetScene for a single Lumi on the watch, wiring lifecycle,
+//  scene phase (battery-saving pause when inactive), reduce-motion, and
+//  accessibility. The scene resizes itself (.resizeFill), so we just fill
+//  the available space.
 //
 
 import SwiftUI
@@ -11,7 +13,7 @@ import SpriteKit
 import LumiCore
 import LumiRendering
 
-struct PetSceneHost: View {
+struct WatchPetSceneHost: View {
     let pet: Pet
 
     @Environment(\.scenePhase) private var scenePhase
@@ -26,13 +28,8 @@ struct PetSceneHost: View {
     }
 
     var body: some View {
-        GeometryReader { geometry in
-            content(size: geometry.size)
-                .onChange(of: geometry.size) { _, newSize in
-                    if case let .scene(scene, _) = built {
-                        scene.setPolicy(PetRenderPolicy.resolve(idiom: .current, size: newSize))
-                    }
-                }
+        GeometryReader { _ in
+            content
         }
         .onAppear { rebuildIfNeeded() }
         .onChange(of: pet.id) { _, _ in rebuildIfNeeded(force: true) }
@@ -43,23 +40,26 @@ struct PetSceneHost: View {
         }
         .onChange(of: scenePhase) { _, newPhase in
             if case let .scene(scene, _) = built {
+                // On watchOS, wrist-down / Always-On Display is .inactive.
+                // Pausing then saves battery; only .active runs the animation.
                 scene.setApplicationActive(newPhase == .active)
             }
         }
     }
 
     @ViewBuilder
-    private func content(size: CGSize) -> some View {
+    private var content: some View {
         switch built {
         case let .scene(scene, _):
+            // watchOS only exposes init(scene:transition:isPaused:preferredFramesPerSecond:);
+            // the `options:` overload (e.g. .allowsTransparency) is unavailable here.
+            // Transparency comes from the scene's clear backgroundColor instead.
             SpriteView(
                 scene: scene,
-                preferredFramesPerSecond: scene.policy.preferredFramesPerSecond,
-                options: [.allowsTransparency]
+                preferredFramesPerSecond: PetRenderPolicy.watch.preferredFramesPerSecond
             )
             .ignoresSafeArea()
             .onAppear {
-                scene.setPolicy(PetRenderPolicy.resolve(idiom: .current, size: size))
                 scene.setReduceMotion(reduceMotion)
                 // onChange only fires on transitions; sync with the launch phase.
                 scene.setApplicationActive(scenePhase == .active)
@@ -71,7 +71,7 @@ struct PetSceneHost: View {
             .accessibilityAddTraits(.isImage)
             .accessibilityIdentifier("lumi.pet")
         case let .failed(message):
-            LumiErrorView(message: message) { rebuildIfNeeded(force: true) }
+            WatchErrorView(message: message) { rebuildIfNeeded(force: true) }
         case nil:
             Color.clear
         }
@@ -82,11 +82,7 @@ struct PetSceneHost: View {
             return
         }
         do {
-            let scene = try PetSceneFactory.makeScene(
-                for: pet,
-                policy: PetRenderPolicy.resolve(idiom: .current, size: .zero),
-                reduceMotion: reduceMotion
-            )
+            let scene = try WatchPetSceneFactory.makeScene(for: pet, reduceMotion: reduceMotion)
             built = .scene(scene, petID: pet.id)
         } catch {
             built = .failed(error.localizedDescription)

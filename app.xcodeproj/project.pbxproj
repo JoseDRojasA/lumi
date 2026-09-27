@@ -12,6 +12,9 @@
 		DF598B123068DC0600D49FD8 /* LumiCore in Frameworks */ = {isa = PBXBuildFile; productRef = DF598B113068DC0600D49FD8 /* LumiCore */; };
 		DF598B143068DC0600D49FD8 /* LumiPersistence in Frameworks */ = {isa = PBXBuildFile; productRef = DF598B133068DC0600D49FD8 /* LumiPersistence */; };
 		DF598B163068DC0600D49FD8 /* LumiRendering in Frameworks */ = {isa = PBXBuildFile; productRef = DF598B153068DC0600D49FD8 /* LumiRendering */; };
+		DF598B193068DCF100D49FD8 /* LumiCore in Frameworks */ = {isa = PBXBuildFile; productRef = DF598B183068DCF100D49FD8 /* LumiCore */; };
+		DF598B1B3068DCF100D49FD8 /* LumiPersistence in Frameworks */ = {isa = PBXBuildFile; productRef = DF598B1A3068DCF100D49FD8 /* LumiPersistence */; };
+		DF598B1D3068DCF100D49FD8 /* LumiRendering in Frameworks */ = {isa = PBXBuildFile; productRef = DF598B1C3068DCF100D49FD8 /* LumiRendering */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -133,6 +136,9 @@
 		DF5989EA306897E400D49FD8 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				DF598B193068DCF100D49FD8 /* LumiCore in Frameworks */,
+				DF598B1D3068DCF100D49FD8 /* LumiRendering in Frameworks */,
+				DF598B1B3068DCF100D49FD8 /* LumiPersistence in Frameworks */,
 			);
 		};
 		DF5989F9306897E500D49FD8 /* Frameworks */ = {
@@ -166,6 +172,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		DF598B173068DCF100D49FD8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		DF8AD49030687E3800A54CF3 = {
 			isa = PBXGroup;
 			children = (
@@ -177,6 +190,7 @@
 				DF598A09306897E500D49FD8 /* LumiWatch Watch AppUITests */,
 				DF8AD49A30687E3800A54CF3 /* Products */,
 				DF8AD4C6306888F700A54CF3 /* docs */,
+				DF598B173068DCF100D49FD8 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -261,6 +275,11 @@
 				DF5989F1306897E400D49FD8 /* LumiWatch Watch App */,
 			);
 			name = "LumiWatch Watch App";
+			packageProductDependencies = (
+				DF598B183068DCF100D49FD8 /* LumiCore */,
+				DF598B1A3068DCF100D49FD8 /* LumiPersistence */,
+				DF598B1C3068DCF100D49FD8 /* LumiRendering */,
+			);
 			productName = "LumiWatch Watch App";
 			productReference = DF5989ED306897E400D49FD8 /* LumiWatch Watch App.app */;
 			productType = "com.apple.product-type.application";
@@ -1135,6 +1154,21 @@
 		};
 		DF598B153068DC0600D49FD8 /* LumiRendering */ = {
 			isa = XCSwiftPackageProductDependency;
+			productName = LumiRendering;
+		};
+		DF598B183068DCF100D49FD8 /* LumiCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DF598B103068DC0600D49FD8 /* XCLocalSwiftPackageReference "Packages/LumiKit" */;
+			productName = LumiCore;
+		};
+		DF598B1A3068DCF100D49FD8 /* LumiPersistence */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DF598B103068DC0600D49FD8 /* XCLocalSwiftPackageReference "Packages/LumiKit" */;
+			productName = LumiPersistence;
+		};
+		DF598B1C3068DCF100D49FD8 /* LumiRendering */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DF598B103068DC0600D49FD8 /* XCLocalSwiftPackageReference "Packages/LumiKit" */;
 			productName = LumiRendering;
 		};
 /* End XCSwiftPackageProductDependency section */

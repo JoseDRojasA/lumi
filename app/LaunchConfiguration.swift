@@ -13,7 +13,7 @@ import Foundation
 /// - `-LumiUITest` selects an in-memory store (no CloudKit, no on-disk state).
 /// - `-LumiSeed <UInt64>` makes the repository's seed deterministic so UI
 ///   tests always see the same pet.
-struct LaunchConfiguration: Equatable {
+nonisolated struct LaunchConfiguration: Equatable, Sendable {
     /// Whether the app should bootstrap with an in-memory store.
     let usesInMemoryStore: Bool
     /// A deterministic seed for the repository, if requested.

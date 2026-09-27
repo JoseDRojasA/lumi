@@ -78,8 +78,7 @@ public final class PetMotionComposer {
     public func combinedOffset(for channel: PetMotionChannel) -> PetMotionOffset {
         guard let sources = offsets[channel], !sources.isEmpty else { return .identity }
         var result = PetMotionOffset.identity
-        for source in sources.keys.sorted(by: { $0.rawValue < $1.rawValue }) {
-            let o = sources[source]!
+        for (_, o) in sources.sorted(by: { $0.key.rawValue < $1.key.rawValue }) {
             result.position.dx += o.position.dx
             result.position.dy += o.position.dy
             result.xScale *= o.xScale

@@ -48,4 +48,25 @@ final class LumiViewModel {
         await task.value
         inFlight = nil
     }
+
+    /// Replaces the loaded Lumi's appearance with `configuration` (validated).
+    /// Display-only: the stored pet is unchanged, so a relaunch shows it again.
+    func apply(_ configuration: PetConfiguration) {
+        guard case let .loaded(pet) = state else { return }
+        do {
+            let validated = try PetConfigurationValidator.validate(configuration)
+            state = .loaded(Pet(
+                id: pet.id,
+                configuration: validated,
+                name: pet.name,
+                createdAt: pet.createdAt,
+                updatedAt: Date(),
+                level: pet.level,
+                experience: pet.experience,
+                isActive: pet.isActive
+            ))
+        } catch {
+            state = .failed(error.localizedDescription)
+        }
+    }
 }

@@ -25,6 +25,15 @@ struct ContentView: View {
                     .controlSize(.large)
             case let .loaded(pet):
                 PetSceneHost(pet: pet)
+                    .overlay(alignment: .bottom) {
+                        Button("Pastel Kitten", systemImage: "wand.and.stars") {
+                            model.apply(LumiPresets.pastelKitten)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .padding(.bottom, 24)
+                        .accessibilityHint("Sets the traits to recreate the pastel kitten reference character")
+                        .accessibilityIdentifier("lumi.applyPreset")
+                    }
             case let .failed(message):
                 LumiErrorView(message: message) {
                     Task { await model.load() }

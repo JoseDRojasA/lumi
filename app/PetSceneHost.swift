@@ -37,6 +37,8 @@ struct PetSceneHost: View {
         .ignoresSafeArea()
         .onAppear { rebuildIfNeeded() }
         .onChange(of: pet.id) { _, _ in rebuildIfNeeded(force: true) }
+        // Same pet, new appearance (e.g. a preset was applied).
+        .onChange(of: pet.configuration) { _, _ in rebuildIfNeeded(force: true) }
         .onChange(of: reduceMotion) { _, newValue in
             if case let .scene(scene, _) = built {
                 scene.setReduceMotion(newValue)
@@ -67,6 +69,10 @@ struct PetSceneHost: View {
                 )
                 .ignoresSafeArea()
                 .accessibilityHidden(true)
+                // A new scene (e.g. after applying a preset) must get a fresh
+                // SpriteView: SpriteView keeps presenting its first scene, and
+                // onAppear below must run again to size and start the new one.
+                .id(ObjectIdentifier(scene))
                 .onAppear {
                     scene.setPolicy(PetRenderPolicy.resolve(idiom: .current, size: size))
                     scene.setReduceMotion(reduceMotion)

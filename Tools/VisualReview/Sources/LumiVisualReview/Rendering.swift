@@ -67,6 +67,16 @@ final class OffscreenRenderer {
         self.renderer = SKRenderer(device: device)
     }
 
+    /// Warms up the Metal pipeline and SKRenderer's first-frame layout by
+    /// rendering `scene` once and discarding the result. SKRenderer's VERY FIRST
+    /// render after `scene` assignment can come back empty / un-laid-out (the
+    /// first matrix cell rendered blank without this); rendering twice and
+    /// keeping the second frame avoids that. Callers that render a scene exactly
+    /// once should call this first.
+    func warmUp(scene: SKScene, pixelSize: CGSize) {
+        _ = render(scene: scene, pixelSize: pixelSize)
+    }
+
     /// Renders `scene` at `pixelSize` (device pixels) and returns a premultiplied
     /// RGBA8 `CGImage`.
     func render(scene: SKScene, pixelSize: CGSize) -> CGImage? {

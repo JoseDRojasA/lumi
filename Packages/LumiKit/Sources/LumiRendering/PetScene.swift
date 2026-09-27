@@ -121,6 +121,10 @@ public final class PetScene: SKScene {
         stage.addChild(rig.root)
         addChild(stage)
 
+        // Policies without effects (e.g. .watch) must NOT draw the static magic
+        // node. characterBounds already excludes magic, so hiding it is safe.
+        applyMagicVisibility()
+
         relayout()
     }
 
@@ -190,7 +194,15 @@ public final class PetScene: SKScene {
                 includesSecondaryMotion: policy.includesSecondaryBreathing
             )
         )
+        // Effects availability may change with the policy — update magic.
+        applyMagicVisibility()
         relayout()
+    }
+
+    /// Shows or hides the static magic node according to the current policy's
+    /// `includesEffects`. Called at init and whenever the policy changes.
+    private func applyMagicVisibility() {
+        rig.magic?.isHidden = !policy.includesEffects
     }
 
     /// Base-pose character bounds mapped into scene coordinates.

@@ -51,6 +51,27 @@ func makeMatrix(
 
     print("\n=== \(title) (\(seeds.count) seeds, policy=\(policy)) ===")
 
+    // Warm-up for THIS matrix's renderer/size. SKRenderer's very first render
+    // after a fresh scene assignment at a new viewport size can come back empty
+    // / un-laid-out — this previously left the FIRST cell (seed 1) blank on
+    // phone and tiny/misplaced on watch. Priming with a throwaway render of the
+    // first seed's scene at this matrix's exact pixel size lays out the scene
+    // and the Metal pipeline before the real capture loop, for BOTH the phone
+    // and watch matrices (each has a distinct renderer viewport).
+    do {
+        let warmSeed = seeds[0]
+        let warmStage = try RigStage(
+            configuration: configs[warmSeed]!,
+            catalog: catalog,
+            layout: layout,
+            policy: policy,
+            sceneSize: sceneSizePt,
+            background: background.skColor
+        )
+        warmStage.resetToBase()
+        renderer.warmUp(scene: warmStage.scene, pixelSize: pxSize)
+    }
+
     for (i, seed) in seeds.enumerated() {
         let stage = try RigStage(
             configuration: configs[seed]!,
@@ -61,6 +82,11 @@ func makeMatrix(
             background: background.skColor
         )
         stage.resetToBase() // BASE pose, no animation advanced
+
+        // Log character bounds + stage scale so size outliers are quantifiable.
+        let cb = stage.characterBounds
+        print(String(format: "  seed %-6llu bounds=%.0fx%.0f (longest=%.0f) stageScale=%.4f",
+                     seed, cb.width, cb.height, max(cb.width, cb.height), stage.stage.xScale))
 
         guard let cg = renderer.render(scene: stage.scene, pixelSize: pxSize) else {
             print("  seed \(seed): RENDER FAILED")
@@ -126,6 +152,36 @@ func analyzeSeed(
     let eyesInside = headFrame.contains(leftEyeFrame.insetBy(dx: 2, dy: 2)) &&
                      headFrame.contains(rightEyeFrame.insetBy(dx: 2, dy: 2))
 
+    // Outside-silhouette check: render the pet twice with magic+shadow hidden —
+    // once with the pattern overlays visible, once with them hidden (the base
+    // "no-pattern" silhouette) — and measure the fraction of opaque pattern
+    // pixels that fall outside that silhouette. A correctly clipped pattern
+    // never spills, so this must be ~0 (≤ 0.2% allowed for edge antialiasing).
+    var outsideSilhouette = 0.0
+    do {
+        let savedMagic2 = stage.rig.magic?.isHidden
+        let savedShadow2 = stage.rig.shadow.isHidden
+        stage.rig.magic?.isHidden = true
+        stage.rig.shadow.isHidden = true
+
+        stage.setPatternsHidden(false)
+        let cgWith = renderer.render(scene: stage.scene, pixelSize: pxSize)
+        stage.setPatternsHidden(true)
+        let cgWithout = renderer.render(scene: stage.scene, pixelSize: pxSize)
+        stage.setPatternsHidden(false)
+
+        if let a = cgWith, let b = cgWithout,
+           let bmpWith = RGBABitmap(a), let bmpWithout = RGBABitmap(b) {
+            outsideSilhouette = Analysis.outsideSilhouetteFraction(
+                withPatterns: bmpWith,
+                silhouette: bmpWithout
+            )
+        }
+
+        if let s = savedMagic2 { stage.rig.magic?.isHidden = s }
+        stage.rig.shadow.isHidden = savedShadow2
+    }
+
     // Color sanity: base vs secondary contrast from the configuration palette.
     let pal = stage.configuration.palette
     let base = (UInt8(pal.baseColor.red * 255), UInt8(pal.baseColor.green * 255), UInt8(pal.baseColor.blue * 255), UInt8(255))
@@ -140,7 +196,8 @@ func analyzeSeed(
         touchesEdge: touches,
         components: components,
         eyesInsideHead: eyesInside,
-        baseSecondaryContrast: contrast
+        baseSecondaryContrast: contrast,
+        outsideSilhouette: outsideSilhouette
     )
 }
 
@@ -371,7 +428,7 @@ func rectStr(_ r: CGRect) -> String {
 @MainActor
 func printAnalysisReport(rows: [SeedAnalysis], configs: [UInt64: PetConfiguration]) {
     print("\n================ AUTOMATED CHECK TABLE (phone .phone renders) ================")
-    print("seed   | canvas    | bbox WxH      | centerΔx% centerΔy% | edge | comps | eyesInHead | base/sec contrast")
+    print("seed   | canvas    | bbox WxH      | centerΔx% centerΔy% | edge | comps | eyesInHead | base/sec contrast | outsideSil%")
     var failures: [(UInt64, String)] = []
 
     for row in rows.sorted(by: { $0.seed < $1.seed }) {
@@ -381,14 +438,18 @@ func printAnalysisReport(rows: [SeedAnalysis], configs: [UInt64: PetConfiguratio
         let dyPct = (cy - Double(row.canvasH) / 2) / Double(row.canvasH) * 100
         let centered = abs(dxPct) <= 3.0 && abs(dyPct) <= 3.0
         let contrastOK = row.baseSecondaryContrast >= 0.12
+        let outsidePct = row.outsideSilhouette * 100
+        let outsideOK = row.outsideSilhouette <= 0.002   // ≤ 0.2%
 
-        print(String(format: "%-6llu | %4dx%-4d | %4dx%-4d    | %+7.2f  %+7.2f  | %-4@ | %5d | %-10@ | %.3f",
+        print(String(format: "%-6llu | %4dx%-4d | %4dx%-4d    | %+7.2f  %+7.2f  | %-4@ | %5d | %-10@ | %.3f | %7.3f%% %@",
                      row.seed, row.canvasW, row.canvasH, row.box.width, row.box.height,
                      dxPct, dyPct,
                      (row.touchesEdge ? "YES" : "no") as NSString,
                      row.components,
                      (row.eyesInsideHead ? "yes" : "NO") as NSString,
-                     row.baseSecondaryContrast))
+                     row.baseSecondaryContrast,
+                     outsidePct,
+                     (outsideOK ? "" : "<<FAIL") as NSString))
 
         var reasons: [String] = []
         if !centered { reasons.append(String(format: "off-center (Δx=%.1f%%, Δy=%.1f%%)", dxPct, dyPct)) }
@@ -396,6 +457,7 @@ func printAnalysisReport(rows: [SeedAnalysis], configs: [UInt64: PetConfiguratio
         if row.components != 1 { reasons.append("detached parts (\(row.components) components, expected 1)") }
         if !row.eyesInsideHead { reasons.append("eye(s) outside head bounds") }
         if !contrastOK { reasons.append(String(format: "low base/secondary contrast (%.3f < 0.12)", row.baseSecondaryContrast)) }
+        if !outsideOK { reasons.append(String(format: "pattern spills outside silhouette (%.3f%% > 0.2%%)", outsidePct)) }
         if !reasons.isEmpty { failures.append((row.seed, reasons.joined(separator: "; "))) }
     }
 
@@ -404,7 +466,12 @@ func printAnalysisReport(rows: [SeedAnalysis], configs: [UInt64: PetConfiguratio
         print("  none — all seeds pass centering / edge / connectivity / eyes / contrast checks.")
     } else {
         for (seed, reason) in failures {
-            print("  seed \(seed): \(reason)")
+            let c = configs[seed]!
+            let ctx = String(format: "tail=%@ len=%.2f thick=%.2f | eyeShape=%@ eyeScale=%.2f | ears=%@ earScale=%.2f",
+                             c.tail.tailStyle.rawValue, c.tail.tailLength, c.tail.tailThickness,
+                             c.face.eyeShape.rawValue, c.face.eyeScale,
+                             c.ears.earStyle.rawValue, c.ears.earScale)
+            print("  seed \(seed): \(reason)\n            [\(ctx)]")
         }
     }
 

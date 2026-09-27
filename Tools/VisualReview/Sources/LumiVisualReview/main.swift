@@ -53,6 +53,10 @@ func run() throws {
     // Analysis rows collected from the phone matrix render pass.
     var analysisRows: [SeedAnalysis] = []
 
+    // Each matrix (phone and watch) warms up its own renderer/size internally
+    // (see makeMatrix), so the first cell of every matrix is laid out before
+    // capture — no separate one-off warm-up needed here.
+
     // ---- Deliverable 1: matrix-phone.png ----
     try makeMatrix(
         title: "matrix-phone",
@@ -158,6 +162,9 @@ struct SeedAnalysis {
     let components: Int
     let eyesInsideHead: Bool
     let baseSecondaryContrast: Double
+    /// Fraction of opaque pattern pixels that spill outside the pattern-free
+    /// silhouette (0 = perfectly clipped; ≤ 0.002 allowed for antialiasing).
+    let outsideSilhouette: Double
 }
 
 // Entry

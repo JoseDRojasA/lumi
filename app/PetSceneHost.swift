@@ -34,6 +34,7 @@ struct PetSceneHost: View {
                     }
                 }
         }
+        .ignoresSafeArea()
         .onAppear { rebuildIfNeeded() }
         .onChange(of: pet.id) { _, _ in rebuildIfNeeded(force: true) }
         .onChange(of: reduceMotion) { _, newValue in

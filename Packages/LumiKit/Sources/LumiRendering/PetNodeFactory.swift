@@ -41,6 +41,13 @@ public struct PetNodeFactory {
         root.addChild(shadow)
 
         // MARK: Tail (relative to root), width × thickness, height × length
+        //
+        // The tail sprite's anchorPoint is set to the tail's ROOT (the base of
+        // the spine within the texture), NOT its centre. That way (a) scaling by
+        // thickness/length grows the tail AWAY from the root, (b) sway rotation
+        // pivots at the root, and (c) placing that anchor at a socket inside the
+        // body silhouette guarantees the base always tucks behind the body for
+        // every style and the full thickness/length range.
         let tailDesign = try (try? layout.designSize(of: "tail_\(config.tail.tailStyle.rawValue)"))
             ?? layout.designSize(of: "fallback_tail")
         let tail = makeSprite(
@@ -53,7 +60,22 @@ public struct PetNodeFactory {
             ),
             tint: palette.baseColor
         )
-        tail.position = layout.point(for: "tail")
+        tail.anchorPoint = Self.tailRootAnchor(for: config.tail.tailStyle)
+        // Socket: inside the body silhouette on the tail side. The body.base is
+        // centred on `bodyAnchor` with half-width `bodyHalfWidth`; pull the
+        // socket inward from the body's right edge so even the smallest body
+        // fully contains the tail root.
+        let bodyBaseDesignForSocket = try (try? layout.designSize(of: "body_\(config.body.bodyShape.rawValue)"))
+            ?? layout.designSize(of: "fallback_body")
+        let bodyHalfWidth = bodyBaseDesignForSocket.width * CGFloat(config.body.bodyScale) / 2
+        let bodyHalfHeight = bodyBaseDesignForSocket.height * CGFloat(config.body.bodyScale) / 2
+        // Keep the socket on the same side as the original tail anchor (right),
+        // but clamp it well inside the body so it can never float free.
+        let tailSideSign: CGFloat = layout.point(for: "tail").x >= bodyAnchor.x ? 1 : -1
+        tail.position = CGPoint(
+            x: bodyAnchor.x + tailSideSign * bodyHalfWidth * 0.42,
+            y: bodyAnchor.y + bodyHalfHeight * 0.02
+        )
         tail.zPosition = -10
         root.addChild(tail)
 
@@ -94,24 +116,48 @@ public struct PetNodeFactory {
         body.addChild(abdomen)
 
         // body.pattern (spots/stripes/gradient) tint accent, alpha 0.35+0.5*density,
-        // size × bodyScale × patternScale
+        // size × bodyScale × patternScale, CLIPPED to the body silhouette.
+        //
+        // The pattern sprite is wrapped in an SKCropNode named `pet.body.pattern`
+        // whose maskNode is an SKSpriteNode duplicating body.base's
+        // texture/size/position (alpha-based mask) so only pixels inside the body
+        // are visible — never a translucent disc overflowing the outline. The
+        // crop lives in the SAME parent space as body.base (both children of
+        // `pet.body`, both at .zero), so any body/abdomen breathing scale applied
+        // to the container transforms the mask and the pattern identically.
         var bodyPattern: SKNode? = nil
         if let patternTexture = bodyPatternTexture(for: config.body.patternStyle) {
-            let patternScale = bodyScale * CGFloat(config.body.patternScale)
+            // Cap the pattern so it never exceeds the base part (in addition to
+            // clipping): patternScale relative to the base is clamped to ≤ 1.0,
+            // then the final size is clamped to the body base size so the crop's
+            // accumulated frame (union of mask + content) never exceeds the body.
+            let patternScale = bodyScale * min(CGFloat(config.body.patternScale), 1.0)
             if let design = try? layout.designSize(of: patternTexture),
                catalog.contains(patternTexture) {
-                let node = makeSprite(
-                    name: "pet.body.pattern",
+                let scaledDesign = scaled(design, by: patternScale)
+                let cappedSize = CGSize(
+                    width: min(scaledDesign.width, bodyBase.size.width),
+                    height: min(scaledDesign.height, bodyBase.size.height)
+                )
+                let sprite = makeSprite(
+                    name: "pet.body.pattern.sprite",
                     texture: patternTexture,
                     fallback: patternTexture,
-                    explicitSize: scaled(design, by: patternScale),
+                    explicitSize: cappedSize,
                     tint: palette.accentColor
                 )
-                node.position = .zero
-                node.zPosition = 2
-                node.alpha = 0.35 + 0.5 * CGFloat(config.body.patternDensity)
-                body.addChild(node)
-                bodyPattern = node
+                sprite.position = .zero
+                sprite.alpha = 0.35 + 0.5 * CGFloat(config.body.patternDensity)
+                let crop = makeCrop(
+                    name: "pet.body.pattern",
+                    maskFrom: bodyBase,
+                    maskPosition: bodyBase.position,
+                    content: sprite,
+                    zPosition: 2
+                )
+                crop.position = .zero
+                body.addChild(crop)
+                bodyPattern = crop
             }
         }
 
@@ -150,23 +196,52 @@ public struct PetNodeFactory {
             explicitSize: pawsDesign,
             tint: palette.baseColor
         )
-        paws.position = layout.point(for: "paws")
+        // Anchor the paws at the layout point, but never let them sit so low that
+        // they detach from the belly. On the smallest bodies the rounded body tip
+        // and the belly (abdomen) narrow to almost nothing, leaving the paws
+        // bridged by only a few anti-aliased pixels (reads as a detached blob).
+        // Raise the paws so their TOP tucks a solid margin into the belly.
+        let pawsPoint = layout.point(for: "paws")
+        let abdomenDesignForPaws = try layout.designSize(of: "abdomen_soft")
+        let abdomenCenterY = layout.point(for: "abdomen").y
+        let abdomenBottom = abdomenCenterY - abdomenDesignForPaws.height * CGFloat(config.body.bodyScale) / 2
+        let pawsHalfHeight = pawsDesign.height / 2
+        // The paws' top edge (y + halfHeight) must reach at least a small margin
+        // above the belly bottom so the silhouette stays a single blob.
+        let minPawsTop = abdomenBottom + pawsHalfHeight * 0.35
+        let minPawsY = minPawsTop - pawsHalfHeight
+        paws.position = CGPoint(x: pawsPoint.x, y: max(pawsPoint.y, minPawsY))
         paws.zPosition = 4
         root.addChild(paws)
 
-        // paws.pattern (socks) tint accent
+        // paws.pattern (socks) tint accent, CLIPPED to the paws silhouette.
         if config.body.patternStyle == .socks, catalog.contains("pattern_socks"),
            let design = try? layout.designSize(of: "pattern_socks") {
-            let node = makeSprite(
-                name: "pet.paws.pattern",
+            // Cap the socks so they never exceed the paws sprite.
+            let cappedSize = CGSize(
+                width: min(design.width, pawsDesign.width),
+                height: min(design.height, pawsDesign.height)
+            )
+            let sprite = makeSprite(
+                name: "pet.paws.pattern.sprite",
                 texture: "pattern_socks",
                 fallback: "pattern_socks",
-                explicitSize: design,
+                explicitSize: cappedSize,
                 tint: palette.accentColor
             )
-            node.position = .zero
-            node.zPosition = 0
-            paws.addChild(node)
+            sprite.position = .zero
+            // Mask: a sprite duplicating the paws texture/size/position so the
+            // socks only show where the paws are. The crop is a child of paws at
+            // .zero, so the paws' local transform applies to both equally.
+            let crop = makeCrop(
+                name: "pet.paws.pattern",
+                maskFrom: paws,
+                maskPosition: .zero,
+                content: sprite,
+                zPosition: 0
+            )
+            crop.position = .zero
+            paws.addChild(crop)
         }
 
         // MARK: Head container (carries head anchor)
@@ -228,21 +303,37 @@ public struct PetNodeFactory {
         headBase.zPosition = 0
         head.addChild(headBase)
 
-        // facePattern (mask) tint accent, × headScale
+        // facePattern (mask) tint accent, × headScale, CLIPPED to the head
+        // silhouette. Mask duplicates head.base's fur-variant texture/size/pos so
+        // the face mask only shows on the head. The crop lives in head space at
+        // .zero, alongside head.base, so headScale/breathing transforms apply
+        // equally to the mask and the pattern.
         var facePattern: SKNode? = nil
         if config.body.patternStyle == .mask, catalog.contains("pattern_mask"),
            let design = try? layout.designSize(of: "pattern_mask") {
-            let node = makeSprite(
-                name: "pet.facePattern",
+            // Cap the face pattern so it never exceeds the head base.
+            let cappedSize = CGSize(
+                width: min(design.width * headScale, headBase.size.width),
+                height: min(design.height * headScale, headBase.size.height)
+            )
+            let sprite = makeSprite(
+                name: "pet.facePattern.sprite",
                 texture: "pattern_mask",
                 fallback: "pattern_mask",
-                explicitSize: scaled(design, by: headScale),
+                explicitSize: cappedSize,
                 tint: palette.accentColor
             )
-            node.position = .zero
-            node.zPosition = 1
-            head.addChild(node)
-            facePattern = node
+            sprite.position = .zero
+            let crop = makeCrop(
+                name: "pet.facePattern",
+                maskFrom: headBase,
+                maskPosition: headBase.position,
+                content: sprite,
+                zPosition: 1
+            )
+            crop.position = .zero
+            head.addChild(crop)
+            facePattern = crop
         }
 
         // headTuft (style != none) tint accent, relative to head
@@ -369,20 +460,57 @@ public struct PetNodeFactory {
         eyes.addChild(rightEyePair.eye)
 
         // MARK: Magic (relative to root)
+        //
+        // Per-feature look (art direction: soft cinematic light, luminous pastel
+        // magic — NEVER a translucent glass bubble covering the pet):
+        //  - glow: a soft, rimless AURA BEHIND the pet (z below tail, above the
+        //    shadow), additive over a near-white radial falloff, tinted with the
+        //    magical colour, centred on the character (body+head midpoint) and
+        //    larger than it, alpha ~0.18…0.45 mapped from intensity.
+        //  - sparkles / orbitingLight: small additive light points that may sit
+        //    in front (z 20) but read as light, not a veil.
         var magic: SKNode? = nil
         if config.details.magicalFeature != .none {
-            let textureName = PetTextureCatalog.magicTextureName(for: config.details.magicalFeature)
+            let feature = config.details.magicalFeature
+            let textureName = PetTextureCatalog.magicTextureName(for: feature)
             if catalog.contains(textureName), let design = try? layout.designSize(of: textureName) {
-                let node = makeSprite(
-                    name: "pet.magic",
-                    texture: textureName,
-                    fallback: textureName,
-                    explicitSize: design,
-                    tint: config.details.magicalColor
-                )
-                node.position = layout.point(for: "magic")
-                node.zPosition = 20
-                node.alpha = 0.3 + 0.6 * CGFloat(config.details.magicalIntensity)
+                let intensity = CGFloat(config.details.magicalIntensity)
+                let node: SKSpriteNode
+                switch feature {
+                case .glow:
+                    // Aura: scaled up so it extends beyond the silhouette; centred
+                    // on the character midpoint (between body and head anchors).
+                    let auraScale: CGFloat = 2.0
+                    node = makeSprite(
+                        name: "pet.magic",
+                        texture: textureName,
+                        fallback: textureName,
+                        explicitSize: scaled(design, by: auraScale),
+                        tint: config.details.magicalColor
+                    )
+                    let characterMidY = (bodyAnchor.y + headAnchor.y) / 2
+                    node.position = CGPoint(x: bodyAnchor.x, y: characterMidY)
+                    node.zPosition = -15               // behind tail (-10), above shadow (-20)
+                    node.blendMode = .add
+                    node.alpha = 0.18 + 0.27 * intensity   // 0.18 … 0.45
+                case .sparkles, .orbitingLight:
+                    node = makeSprite(
+                        name: "pet.magic",
+                        texture: textureName,
+                        fallback: textureName,
+                        explicitSize: design,
+                        tint: config.details.magicalColor
+                    )
+                    node.position = layout.point(for: "magic")
+                    node.zPosition = 20                // in front, but additive
+                    node.blendMode = .add
+                    node.alpha = 0.30 + 0.45 * intensity
+                case .none:
+                    node = makeSprite(
+                        name: "pet.magic", texture: textureName, fallback: textureName,
+                        explicitSize: design, tint: config.details.magicalColor
+                    )
+                }
                 root.addChild(node)
                 magic = node
             }
@@ -536,6 +664,42 @@ public struct PetNodeFactory {
         return makeSprite(name: name, texture: texture, fallback: fallback, explicitSize: size, tint: tint)
     }
 
+    /// Wraps `content` in an `SKCropNode` (named `name`) whose maskNode is a
+    /// fresh `SKSpriteNode` duplicating `base`'s texture, size and position so
+    /// only pixels inside `base`'s silhouette (alpha-based mask) survive.
+    ///
+    /// SKCropNode is available on iOS, macOS and watchOS. The mask is a NEW
+    /// sprite (the real base stays in the tree), left fully opaque and untinted:
+    /// an alpha mask keys off the mask node's per-pixel alpha, so the tint colour
+    /// is irrelevant and must not reduce opacity. The crop node is placed by the
+    /// caller in the SAME parent space as `base`, so any container scale
+    /// (breathing/abdomen/head) transforms the mask and content identically.
+    private func makeCrop(
+        name: String,
+        maskFrom base: SKSpriteNode,
+        maskPosition: CGPoint,
+        content: SKSpriteNode,
+        zPosition: CGFloat
+    ) -> SKCropNode {
+        let mask = SKSpriteNode(texture: base.texture)
+        mask.name = "\(name).mask"
+        mask.size = base.size
+        mask.position = maskPosition
+        mask.zRotation = base.zRotation
+        mask.xScale = base.xScale
+        mask.yScale = base.yScale
+        // Fully opaque, untinted — the alpha mask keys off the texture's alpha.
+        mask.colorBlendFactor = 0
+        mask.alpha = 1
+
+        let crop = SKCropNode()
+        crop.name = name
+        crop.zPosition = zPosition
+        crop.maskNode = mask
+        crop.addChild(content)
+        return crop
+    }
+
     private func applyTint(_ tint: RGBAColor?, to sprite: SKSpriteNode) {
         guard let tint else {
             sprite.colorBlendFactor = 0
@@ -556,6 +720,24 @@ public struct PetNodeFactory {
         case .stripes: return "pattern_stripes"
         case .gradient: return "pattern_gradient"
         default: return nil
+        }
+    }
+
+    /// The tail's ROOT (base of the spine) in the tail texture's normalized,
+    /// y-up coordinates (0,0 = bottom-left), used as the sprite's `anchorPoint`.
+    ///
+    /// These MUST track the spine roots defined in
+    /// `Tools/TextureGenerator/generate.swift` `drawTail(_:_:style:)`:
+    ///   short  spineN[0] = (0.42, 0.28)
+    ///   long   spineN[0] = (0.32, 0.16)
+    ///   plume  spineN[0] = (0.32, 0.16)
+    ///   curled arc[0]     ≈ (0.405, 0.266)
+    static func tailRootAnchor(for style: TailStyle) -> CGPoint {
+        switch style {
+        case .short:  return CGPoint(x: 0.42, y: 0.28)
+        case .long:   return CGPoint(x: 0.32, y: 0.16)
+        case .plume:  return CGPoint(x: 0.32, y: 0.16)
+        case .curled: return CGPoint(x: 0.405, y: 0.266)
         }
     }
 

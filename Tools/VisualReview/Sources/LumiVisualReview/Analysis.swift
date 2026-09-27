@@ -94,4 +94,51 @@ enum Analysis {
         let db = (Double(a.2) - Double(b.2)) / 255.0
         return (dr * dr + dg * dg + db * db).squareRoot()
     }
+
+    /// Fraction of opaque pixels (alpha > `alphaThreshold`) in `withPatterns`
+    /// that fall OUTSIDE the `silhouette` (the same scene rendered with every
+    /// pattern overlay hidden). A pattern that spills past the base part's
+    /// outline shows up as opaque pixels where the silhouette is transparent.
+    ///
+    /// The silhouette mask is dilated by `silhouetteDilation` pixels so a
+    /// pattern sitting exactly on the antialiased base edge is not counted as a
+    /// spill; the returned value is (spill pixels) / (total opaque pixels in the
+    /// patterned image). Both bitmaps must share dimensions.
+    static func outsideSilhouetteFraction(
+        withPatterns: RGBABitmap,
+        silhouette: RGBABitmap,
+        alphaThreshold: UInt8 = 26,      // ~0.1 * 255
+        silhouetteDilation: Int = 1
+    ) -> Double {
+        guard withPatterns.width == silhouette.width,
+              withPatterns.height == silhouette.height else { return 1.0 }
+        let w = withPatterns.width, h = withPatterns.height
+        var spill = 0
+        var total = 0
+        for y in 0..<h {
+            for x in 0..<w {
+                guard withPatterns.alpha(x: x, y: y) > alphaThreshold else { continue }
+                total += 1
+                // Inside the silhouette if any pixel within the dilation radius
+                // is opaque there.
+                var inside = false
+                var dy = -silhouetteDilation
+                while dy <= silhouetteDilation && !inside {
+                    var dx = -silhouetteDilation
+                    while dx <= silhouetteDilation {
+                        let nx = x + dx, ny = y + dy
+                        if nx >= 0, ny >= 0, nx < w, ny < h,
+                           silhouette.alpha(x: nx, y: ny) > alphaThreshold {
+                            inside = true
+                            break
+                        }
+                        dx += 1
+                    }
+                    dy += 1
+                }
+                if !inside { spill += 1 }
+            }
+        }
+        return total == 0 ? 0 : Double(spill) / Double(total)
+    }
 }

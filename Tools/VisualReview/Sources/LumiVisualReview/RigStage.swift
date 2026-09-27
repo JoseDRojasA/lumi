@@ -71,10 +71,23 @@ final class RigStage {
             stage.setScale(scale)
             stage.position = CGPoint(x: -bounds.midX * scale, y: -bounds.midY * scale)
         }
+
+        // Mirror PetScene: policies without effects (e.g. .watch) must NOT draw
+        // the static magic node.
+        rig.magic?.isHidden = !policy.includesEffects
     }
 
     func setMagicHidden(_ hidden: Bool) {
         rig.magic?.isHidden = hidden
+    }
+
+    /// Hide or show every pattern overlay (body spots/stripes/gradient, face
+    /// mask, paw socks) so callers can render the pattern-free silhouette to
+    /// measure whether any pattern pixel spills outside the base part.
+    func setPatternsHidden(_ hidden: Bool) {
+        rig.bodyPattern?.isHidden = hidden
+        rig.facePattern?.isHidden = hidden
+        rig.paws.childNode(withName: "pet.paws.pattern")?.isHidden = hidden
     }
 
     /// Apply a breathing phase deterministically (no SKActions/time), then

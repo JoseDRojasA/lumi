@@ -31,6 +31,7 @@ struct WatchPetSceneHost: View {
         GeometryReader { geometry in
             content(size: geometry.size)
         }
+        .ignoresSafeArea()
         .onAppear { rebuildIfNeeded() }
         .onChange(of: pet.id) { _, _ in rebuildIfNeeded(force: true) }
         .onChange(of: reduceMotion) { _, newValue in

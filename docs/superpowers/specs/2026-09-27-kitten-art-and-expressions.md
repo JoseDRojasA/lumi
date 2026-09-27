@@ -30,7 +30,7 @@ Sizes are approximate size inside the 2048 canvas; the import tool measures the 
 
 | File | Part | Approx. size | Notes |
 |---|---|---|---|
-| `k_shadow.png` | optional | — | Skip; the app draws one |
+| `k_shadow.png` | Ground shadow | — | Keep the stand-in one unless you want a custom shadow |
 | `k_tail.png` | Tail | 600 × 720 | Big fluffy plume, root at lower-left of the tail, curling up on the kitten's left. Drawn separately, fully painted where the body covers it |
 | `k_body.png` | Body | 880 × 760 | Sitting body without paws, head, chest fluff. Top continues ~15 % under where the head sits |
 | `k_chest.png` | Chest fluff | 560 × 400 | Lighter fluffy bib |
@@ -69,6 +69,23 @@ Painted on the same canvas, in place, over the neutral face.
 | `k_tear_left.png` | Sad (optional) | Glossy tear-well highlight on the lower lid |
 
 Brow angle, lid height, pupil size, blush strength, ear angle and head tilt are animated by the app, so they need no extra art.
+
+Iris, pupil and both catchlights are painted once, in the **left** eye. The right eye reuses them: iris and pupil mirrored, catchlights not (same light direction).
+
+### Delivering and importing
+
+Put the layers in `Art/Kitten/` (stand-ins live there now) together with `pivots.json`, which gives the tail root, ear base and neck in 1024-point canvas coordinates, y up:
+
+```json
+{ "k_head": [512, 420], "k_ear_left": [370, 745], "k_tail": [640, 240] }
+```
+
+Then run:
+
+```sh
+swift Tools/KittenArt/import.swift          # Art/Kitten → app/LumiKitten.atlas + app/KittenRig.json
+swift Tools/KittenArt/make-standins.swift   # regenerate the stand-in layers (overwrites Art/Kitten)
+```
 
 ### Image-generator prompts (for the master painting)
 

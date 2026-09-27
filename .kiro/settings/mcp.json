@@ -3,6 +3,12 @@
     "xcode": {
       "command": "xcrun",
       "args": ["mcpbridge"]
+    },
+    "playwright": {
+      "disabled": true
+    },
+    "codegraph": {
+      "disabled": true
     }
   }
 }

@@ -19,6 +19,8 @@ final class LumiViewModel {
     }
 
     private(set) var state: State = .loading
+    /// Which art the loaded pet is drawn with. Display-only, like `apply(_:)`.
+    private(set) var appearance: PetAppearance = .generated
 
     private let repository: any PetRepository
     /// A load already in flight; a second `load()` awaits this instead of starting another.
@@ -49,10 +51,12 @@ final class LumiViewModel {
         inFlight = nil
     }
 
-    /// Replaces the loaded Lumi's appearance with `configuration` (validated).
+    /// Replaces the loaded Lumi's appearance with `configuration` (validated),
+    /// drawn with `appearance`.
     /// Display-only: the stored pet is unchanged, so a relaunch shows it again.
-    func apply(_ configuration: PetConfiguration) {
+    func apply(_ configuration: PetConfiguration, appearance: PetAppearance = .generated) {
         guard case let .loaded(pet) = state else { return }
+        self.appearance = appearance
         do {
             let validated = try PetConfigurationValidator.validate(configuration)
             state = .loaded(Pet(

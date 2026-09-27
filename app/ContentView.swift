@@ -24,10 +24,10 @@ struct ContentView: View {
                 ProgressView()
                     .controlSize(.large)
             case let .loaded(pet):
-                PetSceneHost(pet: pet)
+                PetSceneHost(pet: pet, appearance: model.appearance)
                     .overlay(alignment: .bottom) {
                         Button("Pastel Kitten", systemImage: "wand.and.stars") {
-                            model.apply(LumiPresets.pastelKitten)
+                            model.apply(LumiPresets.pastelKitten, appearance: .kitten)
                         }
                         .buttonStyle(.borderedProminent)
                         .padding(.bottom, 24)

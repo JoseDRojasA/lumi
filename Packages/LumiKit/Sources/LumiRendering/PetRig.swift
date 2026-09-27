@@ -104,6 +104,10 @@ public final class PetRig {
     public let bodyPattern: SKNode?
     public let facePattern: SKNode?
 
+    /// Extra face nodes keyed by node name (brows, mouth shapes, closed-eye
+    /// overlays). Empty for the procedural rig; used by expression-capable rigs.
+    public let faceParts: [String: SKNode]
+
     public let base: PetRigBaseTransforms
     public let requiredNodes: [SKNode]
 
@@ -132,8 +136,10 @@ public final class PetRig {
         rightCheek: SKNode?,
         magic: SKNode?,
         bodyPattern: SKNode?,
-        facePattern: SKNode?
+        facePattern: SKNode?,
+        faceParts: [String: SKNode] = [:]
     ) {
+        self.faceParts = faceParts
         self.root = root
         self.shadow = shadow
         self.tail = tail

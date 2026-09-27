@@ -1,0 +1,183 @@
+{
+  "canvas" : {
+    "height" : 1024,
+    "width" : 1024
+  },
+  "parts" : {
+    "k_blush_left" : {
+      "height" : 75,
+      "width" : 126,
+      "x" : 0.3271,
+      "y" : 0.5029
+    },
+    "k_body" : {
+      "height" : 384,
+      "width" : 404,
+      "x" : 0.5,
+      "y" : 0.293
+    },
+    "k_brow_left" : {
+      "height" : 32.5,
+      "width" : 101,
+      "x" : 0.3931,
+      "y" : 0.6868
+    },
+    "k_catchlight_big" : {
+      "height" : 44,
+      "width" : 44,
+      "x" : 0.4238,
+      "y" : 0.5938
+    },
+    "k_catchlight_small" : {
+      "height" : 22,
+      "width" : 22,
+      "x" : 0.3828,
+      "y" : 0.5469
+    },
+    "k_chest" : {
+      "height" : 234,
+      "width" : 240,
+      "x" : 0.5,
+      "y" : 0.3467
+    },
+    "k_ear_left" : {
+      "height" : 269,
+      "pivotX" : 0.514,
+      "pivotY" : 0.1747,
+      "width" : 179,
+      "x" : 0.3589,
+      "y" : 0.813
+    },
+    "k_eye_closed_left" : {
+      "height" : 33.5,
+      "width" : 116,
+      "x" : 0.4004,
+      "y" : 0.5725
+    },
+    "k_eye_closed_right" : {
+      "height" : 33.5,
+      "width" : 116,
+      "x" : 0.5996,
+      "y" : 0.5725
+    },
+    "k_eye_happy_left" : {
+      "height" : 48.5,
+      "width" : 116,
+      "x" : 0.4004,
+      "y" : 0.5774
+    },
+    "k_eye_happy_right" : {
+      "height" : 48.5,
+      "width" : 116,
+      "x" : 0.5996,
+      "y" : 0.5774
+    },
+    "k_eye_white_left" : {
+      "height" : 179,
+      "width" : 167,
+      "x" : 0.4004,
+      "y" : 0.5762
+    },
+    "k_eye_white_right" : {
+      "height" : 179,
+      "width" : 167,
+      "x" : 0.5996,
+      "y" : 0.5762
+    },
+    "k_hair" : {
+      "height" : 179,
+      "width" : 184,
+      "x" : 0.5078,
+      "y" : 0.8667
+    },
+    "k_head" : {
+      "height" : 454,
+      "pivotX" : 0.5,
+      "pivotY" : 0.1035,
+      "width" : 618,
+      "x" : 0.5,
+      "y" : 0.5859
+    },
+    "k_iris" : {
+      "height" : 128,
+      "width" : 128,
+      "x" : 0.4023,
+      "y" : 0.5684
+    },
+    "k_lid_left" : {
+      "height" : 188,
+      "width" : 176,
+      "x" : 0.4004,
+      "y" : 0.5781
+    },
+    "k_lid_right" : {
+      "height" : 188,
+      "width" : 176,
+      "x" : 0.5996,
+      "y" : 0.5781
+    },
+    "k_mouth_neutral" : {
+      "height" : 22,
+      "width" : 71,
+      "x" : 0.5,
+      "y" : 0.4731
+    },
+    "k_mouth_o" : {
+      "height" : 38,
+      "width" : 32,
+      "x" : 0.5,
+      "y" : 0.4648
+    },
+    "k_mouth_sad" : {
+      "height" : 23,
+      "width" : 59,
+      "x" : 0.5,
+      "y" : 0.4648
+    },
+    "k_mouth_smile" : {
+      "height" : 41,
+      "width" : 72,
+      "x" : 0.5,
+      "y" : 0.4624
+    },
+    "k_nose" : {
+      "height" : 30,
+      "width" : 48,
+      "x" : 0.5,
+      "y" : 0.5068
+    },
+    "k_paw_left" : {
+      "height" : 92,
+      "width" : 140,
+      "x" : 0.4297,
+      "y" : 0.1318
+    },
+    "k_paw_right" : {
+      "height" : 92,
+      "width" : 140,
+      "x" : 0.5703,
+      "y" : 0.1318
+    },
+    "k_pupil" : {
+      "height" : 80,
+      "width" : 72,
+      "x" : 0.4023,
+      "y" : 0.5664
+    },
+    "k_shadow" : {
+      "height" : 82,
+      "width" : 470,
+      "x" : 0.5,
+      "y" : 0.1172
+    },
+    "k_tail" : {
+      "height" : 449,
+      "pivotX" : 0.2006,
+      "pivotY" : 0.1281,
+      "width" : 309,
+      "x" : 0.7153,
+      "y" : 0.3975
+    }
+  },
+  "version" : 1
+}

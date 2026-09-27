@@ -71,20 +71,32 @@ public final class PetScene: SKScene {
 
     // MARK: - Init
 
-    public init(
+    /// Builds the procedural rig for `presentation` and hosts it.
+    public convenience init(
         presentation: PetPresentation,
         catalog: PetTextureCatalog,
         layout: PetRigLayout,
         policy: PetRenderPolicy,
         reduceMotion: Bool
     ) throws {
+        let factory = PetNodeFactory(catalog: catalog, layout: layout)
+        let rig = try factory.makeRig(presentation: presentation)
+        self.init(rig: rig, presentation: presentation, policy: policy, reduceMotion: reduceMotion)
+    }
+
+    /// Hosts an already-assembled rig (e.g. one built by `KittenNodeFactory`).
+    /// The rig must follow the `pet.*` node naming contract used by the motion
+    /// controllers (`pet.body.base`, `pet.eye.<side>.iris|pupil|catchlight`).
+    public init(
+        rig: PetRig,
+        presentation: PetPresentation,
+        policy: PetRenderPolicy,
+        reduceMotion: Bool
+    ) {
         self.configuration = presentation.configuration
         self.policy = policy
         self.reduceMotion = reduceMotion
         self.accessibilityDescription = presentation.accessibilityDescription
-
-        let factory = PetNodeFactory(catalog: catalog, layout: layout)
-        let rig = try factory.makeRig(presentation: presentation)
         self.rig = rig
 
         let stage = SKNode()

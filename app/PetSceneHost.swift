@@ -13,7 +13,7 @@ import LumiRendering
 
 struct PetSceneHost: View {
     let pet: Pet
-
+    var appearance: PetAppearance = .generated
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -39,6 +39,7 @@ struct PetSceneHost: View {
         .onChange(of: pet.id) { _, _ in rebuildIfNeeded(force: true) }
         // Same pet, new appearance (e.g. a preset was applied).
         .onChange(of: pet.configuration) { _, _ in rebuildIfNeeded(force: true) }
+        .onChange(of: appearance) { _, _ in rebuildIfNeeded(force: true) }
         .onChange(of: reduceMotion) { _, newValue in
             if case let .scene(scene, _) = built {
                 scene.setReduceMotion(newValue)
@@ -109,6 +110,7 @@ struct PetSceneHost: View {
         do {
             let scene = try PetSceneFactory.makeScene(
                 for: pet,
+                appearance: appearance,
                 policy: PetRenderPolicy.resolve(idiom: .current, size: .zero),
                 reduceMotion: reduceMotion
             )

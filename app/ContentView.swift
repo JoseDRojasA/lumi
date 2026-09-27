@@ -2,81 +2,44 @@
 //  ContentView.swift
 //  app
 //
-//  Created by Jose Rojas  on 26/09/26.
+//  The centered Lumi shell: background + loading / pet / error states.
 //
 
 import SwiftUI
-import SwiftData
+import LumiCore
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @State private var model: LumiViewModel
+
+    init(repository: any PetRepository) {
+        _model = State(initialValue: LumiViewModel(repository: repository))
+    }
 
     var body: some View {
-        NavigationViewWrapper {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
-                }
-                .onDelete(perform: deleteItems)
-            }
-#if os(macOS)
-            .navigationSplitViewColumnWidth(min: 180, ideal: 200)
-#endif
-            .toolbar {
-#if os(iOS)
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-#endif
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
+        ZStack {
+            LumiBackground()
+
+            switch model.state {
+            case .loading:
+                ProgressView()
+                    .controlSize(.large)
+            case let .loaded(pet):
+                PetSceneHost(pet: pet)
+            case let .failed(message):
+                LumiErrorView(message: message) {
+                    Task { await model.load() }
                 }
             }
         }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
-        }
-    }
-}
-
-fileprivate struct NavigationViewWrapper<Content: View>: View {
-    let content: () -> Content
-
-    var body: some View {
-#if os(macOS)
-        NavigationSplitView {
-            content()
-        } detail: {
-            Text("Select an item")
-        }
-#else
-        NavigationStack {
-            content()
-        }
-#endif
+        .task { await model.load() }
     }
 }
 
 #Preview {
-    ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+    // In-memory repository so the preview shows a freshly generated Lumi.
+    if let repository = try? AppDependencies.make(inMemory: true) {
+        ContentView(repository: repository)
+    } else {
+        LumiErrorView(message: "Preview unavailable") {}
+    }
 }

@@ -157,10 +157,28 @@ public final class PetScene: SKScene {
         )
     }
 
+    /// SpriteKit invokes `didChangeSize(_:)` on the main thread. On the iOS/tvOS/
+    /// macOS SDKs `SKNode`/`SKScene` inherit `@MainActor` isolation (via
+    /// `UIResponder`/`NSResponder`), so the override is main-actor isolated like
+    /// the rest of this class. On watchOS `SKNode` descends from `NSObject` and is
+    /// nonisolated, so the override must be `nonisolated` there and hop onto the
+    /// main actor with `MainActor.assumeIsolated`. That hop is sound because
+    /// SpriteKit only ever calls this on the main thread, so `self` is never
+    /// touched concurrently.
+    #if os(watchOS)
+    nonisolated public override func didChangeSize(_ oldSize: CGSize) {
+        super.didChangeSize(oldSize)
+        nonisolated(unsafe) let unsafeSelf = self
+        MainActor.assumeIsolated {
+            unsafeSelf.relayout()
+        }
+    }
+    #else
     public override func didChangeSize(_ oldSize: CGSize) {
         super.didChangeSize(oldSize)
         relayout()
     }
+    #endif
 
     public func setPolicy(_ policy: PetRenderPolicy) {
         self.policy = policy
@@ -224,7 +242,23 @@ public final class PetScene: SKScene {
 
     // MARK: - Frame loop
 
+    /// SpriteKit invokes `update(_:)` on the main thread. See ``didChangeSize(_:)``
+    /// for why watchOS needs a `nonisolated` override while the other platforms
+    /// keep the class's main-actor isolation.
+    #if os(watchOS)
+    nonisolated public override func update(_ currentTime: TimeInterval) {
+        nonisolated(unsafe) let unsafeSelf = self
+        MainActor.assumeIsolated {
+            unsafeSelf.step(currentTime: currentTime)
+        }
+    }
+    #else
     public override func update(_ currentTime: TimeInterval) {
+        step(currentTime: currentTime)
+    }
+    #endif
+
+    private func step(currentTime: TimeInterval) {
         guard isAnimating, !isPaused else {
             lastUpdateTime = nil
             return
@@ -239,7 +273,23 @@ public final class PetScene: SKScene {
         secondary.advance(by: dt)
     }
 
+    /// SpriteKit invokes `didEvaluateActions()` on the main thread. See
+    /// ``didChangeSize(_:)`` for why watchOS needs a `nonisolated` override while
+    /// the other platforms keep the class's main-actor isolation.
+    #if os(watchOS)
+    nonisolated public override func didEvaluateActions() {
+        nonisolated(unsafe) let unsafeSelf = self
+        MainActor.assumeIsolated {
+            unsafeSelf.applyComposedMotion()
+        }
+    }
+    #else
     public override func didEvaluateActions() {
+        applyComposedMotion()
+    }
+    #endif
+
+    private func applyComposedMotion() {
         // Single authoritative write per frame, after breathing's SKActions ran.
         composer.apply()
     }

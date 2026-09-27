@@ -2,31 +2,26 @@
 //  appApp.swift
 //  app
 //
-//  Created by Jose Rojas  on 26/09/26.
+//  Lumi app entry point. Computes bootstrap once and shows the shell or a
+//  retryable error. No crash-on-failure, no SwiftData model container here.
 //
 
 import SwiftUI
-import SwiftData
 
 @main
-struct appApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
+struct LumiApp: App {
+    @State private var bootstrap: AppBootstrap = AppBootstrap.make()
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            switch bootstrap {
+            case let .ready(repository):
+                ContentView(repository: repository)
+            case let .failed(message):
+                LumiErrorView(message: message) {
+                    bootstrap = AppBootstrap.make()
+                }
+            }
         }
-        .modelContainer(sharedModelContainer)
     }
 }

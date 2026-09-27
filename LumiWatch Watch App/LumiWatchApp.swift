@@ -7,10 +7,14 @@
 //
 
 import SwiftUI
+import Foundation
 
 @main
 struct LumiWatchApp: App {
-    @State private var bootstrap: WatchBootstrap = WatchBootstrap.make()
+    @State private var bootstrap: WatchBootstrap = {
+        let config = LaunchConfiguration(arguments: ProcessInfo.processInfo.arguments)
+        return WatchBootstrap.make(inMemory: config.usesInMemoryStore, seed: config.seed)
+    }()
 
     var body: some Scene {
         WindowGroup {
@@ -19,7 +23,8 @@ struct LumiWatchApp: App {
                 WatchRootView(repository: repository)
             case let .failed(message):
                 WatchErrorView(message: message) {
-                    bootstrap = WatchBootstrap.make()
+                    let config = LaunchConfiguration(arguments: ProcessInfo.processInfo.arguments)
+                    bootstrap = WatchBootstrap.make(inMemory: config.usesInMemoryStore, seed: config.seed)
                 }
             }
         }

@@ -28,8 +28,8 @@ struct WatchPetSceneHost: View {
     }
 
     var body: some View {
-        GeometryReader { _ in
-            content
+        GeometryReader { geometry in
+            content(size: geometry.size)
         }
         .onAppear { rebuildIfNeeded() }
         .onChange(of: pet.id) { _, _ in rebuildIfNeeded(force: true) }
@@ -48,28 +48,41 @@ struct WatchPetSceneHost: View {
     }
 
     @ViewBuilder
-    private var content: some View {
+    private func content(size: CGSize) -> some View {
         switch built {
         case let .scene(scene, _):
-            // watchOS only exposes init(scene:transition:isPaused:preferredFramesPerSecond:);
-            // the `options:` overload (e.g. .allowsTransparency) is unavailable here.
-            // Transparency comes from the scene's clear backgroundColor instead.
-            SpriteView(
-                scene: scene,
-                preferredFramesPerSecond: PetRenderPolicy.watch.preferredFramesPerSecond
-            )
-            .ignoresSafeArea()
-            .onAppear {
-                scene.setReduceMotion(reduceMotion)
-                // onChange only fires on transitions; sync with the launch phase.
-                scene.setApplicationActive(scenePhase == .active)
-                scene.startAnimation()
+            let petFrame = scene.characterFrameInView(viewSize: size)
+            ZStack(alignment: .topLeading) {
+                // watchOS only exposes init(scene:transition:isPaused:preferredFramesPerSecond:);
+                // the `options:` overload (e.g. .allowsTransparency) is unavailable here.
+                // Transparency comes from the scene's clear backgroundColor instead.
+                SpriteView(
+                    scene: scene,
+                    preferredFramesPerSecond: PetRenderPolicy.watch.preferredFramesPerSecond
+                )
+                .ignoresSafeArea()
+                .accessibilityHidden(true)
+                .onAppear {
+                    scene.setReduceMotion(reduceMotion)
+                    // onChange only fires on transitions; sync with the launch phase.
+                    scene.setApplicationActive(scenePhase == .active)
+                    scene.startAnimation()
+                }
+                .onDisappear { scene.stopAnimation() }
+
+                // A clear element sized/positioned to the pet's on-screen
+                // character frame, carrying the single `lumi.pet` accessibility
+                // element (the SpriteView above is hidden so its SpriteKit node
+                // names are not exposed as nested elements).
+                Color.clear
+                    .frame(width: petFrame.width, height: petFrame.height)
+                    .position(x: petFrame.midX, y: petFrame.midY)
+                    .accessibilityElement()
+                    .accessibilityLabel(scene.accessibilityDescription)
+                    .accessibilityAddTraits(.isImage)
+                    .accessibilityIdentifier("lumi.pet")
             }
-            .onDisappear { scene.stopAnimation() }
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(scene.accessibilityDescription)
-            .accessibilityAddTraits(.isImage)
-            .accessibilityIdentifier("lumi.pet")
+            .frame(width: size.width, height: size.height)
         case let .failed(message):
             WatchErrorView(message: message) { rebuildIfNeeded(force: true) }
         case nil:

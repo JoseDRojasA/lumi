@@ -16,8 +16,11 @@ enum WatchDependencies {
     /// Builds a SwiftData-backed repository. Pass `inMemory: true` for previews
     /// and tests. Production launches sync through the private CloudKit database
     /// and fall back to a local-only store if CloudKit is unavailable.
-    static func make(inMemory: Bool = false) throws -> any PetRepository {
+    static func make(inMemory: Bool = false, seed: UInt64? = nil) throws -> any PetRepository {
         let store = try LumiModelContainerFactory.makeSyncedStore(inMemory: inMemory)
+        if let seed {
+            return SwiftDataPetRepository(container: store.container, seed: { seed })
+        }
         return SwiftDataPetRepository(container: store.container)
     }
 }
@@ -27,9 +30,9 @@ enum WatchBootstrap {
     case ready(any PetRepository)
     case failed(String)
 
-    static func make(inMemory: Bool = false) -> WatchBootstrap {
+    static func make(inMemory: Bool = false, seed: UInt64? = nil) -> WatchBootstrap {
         do {
-            return .ready(try WatchDependencies.make(inMemory: inMemory))
+            return .ready(try WatchDependencies.make(inMemory: inMemory, seed: seed))
         } catch {
             return .failed(error.localizedDescription)
         }

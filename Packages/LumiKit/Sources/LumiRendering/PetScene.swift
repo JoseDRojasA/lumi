@@ -206,6 +206,50 @@ public final class PetScene: SKScene {
         )
     }
 
+    /// The base-pose character rect in scene coordinates for a scene of the
+    /// given size and policy, computed purely (does not read or mutate the live
+    /// `size`/`policy`). Mirrors `relayout()`'s math so the host can position an
+    /// accessibility overlay deterministically before SpriteKit lays out.
+    public func characterFrameInScene(forSize size: CGSize, policy: PetRenderPolicy) -> CGRect {
+        let shorter = min(size.width, size.height)
+        let longest = max(characterBounds.width, characterBounds.height)
+        guard shorter > 0, longest > 0 else { return .zero }
+        let scale = shorter * policy.sizeFraction / longest
+        // relayout(): stage.position = -characterBounds.mid * scale.
+        let stageX = -characterBounds.midX * scale
+        let stageY = -characterBounds.midY * scale
+        return CGRect(
+            x: stageX + characterBounds.minX * scale,
+            y: stageY + characterBounds.minY * scale,
+            width: characterBounds.width * scale,
+            height: characterBounds.height * scale
+        )
+    }
+
+    /// Converts a rect expressed in this scene's coordinate space (anchorPoint
+    /// (0.5, 0.5), y-up, origin at the scene centre) into SwiftUI view
+    /// coordinates (origin top-left, y-down). The scene uses `.resizeFill`, so
+    /// scene points and view points share the same scale; `sceneSize` is the
+    /// view's size in points.
+    ///
+    /// Pure and static so it can be unit-tested without a live scene.
+    public static func viewRect(fromSceneRect sceneRect: CGRect, sceneSize: CGSize) -> CGRect {
+        let halfWidth = sceneSize.width / 2
+        let halfHeight = sceneSize.height / 2
+        // x: shift origin from centre to left edge.
+        let viewX = halfWidth + sceneRect.minX
+        // y: flip. The scene's TOP edge (maxY, up) becomes the view's minY.
+        let viewY = halfHeight - sceneRect.maxY
+        return CGRect(x: viewX, y: viewY, width: sceneRect.width, height: sceneRect.height)
+    }
+
+    /// The base-pose character rect in SwiftUI view coordinates for a view of
+    /// `viewSize` points (equal to the scene size under `.resizeFill`).
+    public func characterFrameInView(viewSize: CGSize) -> CGRect {
+        let sceneRect = characterFrameInScene(forSize: viewSize, policy: policy)
+        return Self.viewRect(fromSceneRect: sceneRect, sceneSize: viewSize)
+    }
+
     // MARK: - Animation lifecycle
 
     public func startAnimation() {

@@ -2,7 +2,7 @@
 //  LumiWatch_Watch_AppUITests.swift
 //  LumiWatch Watch AppUITests
 //
-//  Created by Jose Rojas  on 26/09/26.
+//  Task 14a: verifies Lumi renders centered and correctly sized on the watch.
 //
 
 import XCTest
@@ -10,34 +10,35 @@ import XCTest
 final class LumiWatch_Watch_AppUITests: XCTestCase {
 
     override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-
-        // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
-
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
-    }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
     @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
+    func testWatchPetIsCentered() throws {
         let app = XCUIApplication()
+        app.launchArguments += ["-LumiUITest", "-LumiSeed", "42"]
         app.launch()
 
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // XCUIAutomation Documentation
-        // https://developer.apple.com/documentation/xcuiautomation
-    }
+        let pet = app.descendants(matching: .any)["lumi.pet"]
+        XCTAssertTrue(pet.waitForExistence(timeout: 10), "lumi.pet never appeared")
 
-    @MainActor
-    func testLaunchPerformance() throws {
-        // This measures how long it takes to launch your application.
-        measure(metrics: [XCTApplicationLaunchMetric()]) {
-            XCUIApplication().launch()
-        }
+        let window = app.windows.firstMatch.frame
+        let petFrame = pet.frame
+
+        let dx = abs(petFrame.midX - window.midX)
+        let dy = abs(petFrame.midY - window.midY)
+        XCTAssertLessThanOrEqual(dx, 0.03 * window.width, "pet not horizontally centered: dx=\(dx)")
+        XCTAssertLessThanOrEqual(dy, 0.03 * window.height, "pet not vertically centered: dy=\(dy)")
+
+        let longest = max(petFrame.width, petFrame.height)
+        let shorter = min(window.width, window.height)
+        let fraction = longest / shorter
+        let expected: CGFloat = 0.62
+        XCTAssertTrue(
+            fraction >= expected * 0.85 && fraction <= expected * 1.15,
+            "pet size fraction \(fraction) not within ±15% of \(expected)"
+        )
+
+        XCTAssertFalse(pet.label.isEmpty, "pet accessibility label is empty")
     }
 }

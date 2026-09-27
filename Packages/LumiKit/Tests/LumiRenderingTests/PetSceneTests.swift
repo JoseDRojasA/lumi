@@ -173,6 +173,49 @@ struct PetSceneTests {
         #expect(scene.rig.rightEyelid.alpha == 0)
     }
 
+    @Test func sceneRectConvertsToViewRectFlippingY() {
+        // Scene: anchorPoint (0.5,0.5), y-up. View: origin top-left, y-down.
+        // A scene rect centered at origin maps to the view's centre.
+        let sceneSize = CGSize(width: 200, height: 400)
+        let sceneRect = CGRect(x: -30, y: -40, width: 60, height: 80)
+        let viewRect = PetScene.viewRect(fromSceneRect: sceneRect, sceneSize: sceneSize)
+        // width/height preserved.
+        #expect(viewRect.width == 60)
+        #expect(viewRect.height == 80)
+        // Centre maps to the view centre (100, 200).
+        #expect(abs(viewRect.midX - 100) < 1e-9)
+        #expect(abs(viewRect.midY - 200) < 1e-9)
+    }
+
+    @Test func sceneRectAboveCentreMapsHigherInView() {
+        // A rect above scene origin (positive y) should sit ABOVE the view
+        // centre, i.e. a smaller view-y (origin top-left).
+        let sceneSize = CGSize(width: 200, height: 400)
+        let sceneRect = CGRect(x: -10, y: 50, width: 20, height: 20) // midY = 60 (scene, up)
+        let viewRect = PetScene.viewRect(fromSceneRect: sceneRect, sceneSize: sceneSize)
+        // view midY = sceneSize.height/2 - sceneMidY = 200 - 60 = 140.
+        #expect(abs(viewRect.midY - 140) < 1e-9)
+        // view minY = height/2 - sceneMaxY = 200 - 70 = 130.
+        #expect(abs(viewRect.minY - 130) < 1e-9)
+    }
+
+    @Test func characterFrameInViewIsCentredForEveryPolicy() throws {
+        let cases: [(CGSize, PetRenderPolicy)] = [
+            (CGSize(width: 390, height: 844), .phone),
+            (CGSize(width: 844, height: 390), .phoneLandscape),
+            (CGSize(width: 1024, height: 1366), .pad),
+            (CGSize(width: 1200, height: 800), .mac),
+            (CGSize(width: 198, height: 242), .watch),
+        ]
+        for (size, policy) in cases {
+            let scene = try makeScene(policy: policy)
+            resize(scene, size)
+            let viewRect = PetScene.viewRect(fromSceneRect: scene.characterFrameInScene, sceneSize: size)
+            #expect(abs(viewRect.midX - size.width / 2) <= 0.5, "policy \(policy) viewMidX \(viewRect.midX)")
+            #expect(abs(viewRect.midY - size.height / 2) <= 0.5, "policy \(policy) viewMidY \(viewRect.midY)")
+        }
+    }
+
     @Test func watchPolicyDisablesEffects() throws {
         // Use a seed whose configuration has a magical feature so magicPulse
         // would be non-zero were effects enabled.

@@ -52,24 +52,42 @@ struct PetSceneHost: View {
     private func content(size: CGSize) -> some View {
         switch built {
         case let .scene(scene, _):
-            SpriteView(
-                scene: scene,
-                preferredFramesPerSecond: scene.policy.preferredFramesPerSecond,
-                options: [.allowsTransparency]
-            )
-            .ignoresSafeArea()
-            .onAppear {
-                scene.setPolicy(PetRenderPolicy.resolve(idiom: .current, size: size))
-                scene.setReduceMotion(reduceMotion)
-                // onChange only fires on transitions; sync with the launch phase.
-                scene.setApplicationActive(scenePhase == .active)
-                scene.startAnimation()
+            // The scene renders at the GeometryReader's `size` (the SpriteView
+            // is expanded past the safe area only for background bleed; the
+            // scene's `.resizeFill` uses this content size). Compute the pet's
+            // on-screen frame in this same coordinate space so the overlay lines
+            // up with the rendered character.
+            let petFrame = scene.characterFrameInView(viewSize: size)
+            ZStack(alignment: .topLeading) {
+                SpriteView(
+                    scene: scene,
+                    preferredFramesPerSecond: scene.policy.preferredFramesPerSecond,
+                    options: [.allowsTransparency]
+                )
+                .ignoresSafeArea()
+                .accessibilityHidden(true)
+                .onAppear {
+                    scene.setPolicy(PetRenderPolicy.resolve(idiom: .current, size: size))
+                    scene.setReduceMotion(reduceMotion)
+                    // onChange only fires on transitions; sync with the launch phase.
+                    scene.setApplicationActive(scenePhase == .active)
+                    scene.startAnimation()
+                }
+                .onDisappear { scene.stopAnimation() }
+
+                // A clear element sized/positioned to the pet's on-screen
+                // character frame, carrying the single `lumi.pet` accessibility
+                // element (the SpriteView above is hidden so its SpriteKit node
+                // names are not exposed as nested elements).
+                Color.clear
+                    .frame(width: petFrame.width, height: petFrame.height)
+                    .position(x: petFrame.midX, y: petFrame.midY)
+                    .accessibilityElement()
+                    .accessibilityLabel(scene.accessibilityDescription)
+                    .accessibilityAddTraits(.isImage)
+                    .accessibilityIdentifier("lumi.pet")
             }
-            .onDisappear { scene.stopAnimation() }
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel(scene.accessibilityDescription)
-            .accessibilityAddTraits(.isImage)
-            .accessibilityIdentifier("lumi.pet")
+            .frame(width: size.width, height: size.height)
         case let .failed(message):
             LumiErrorView(message: message) { rebuildIfNeeded(force: true) }
         case nil:

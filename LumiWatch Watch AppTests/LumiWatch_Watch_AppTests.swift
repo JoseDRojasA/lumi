@@ -81,6 +81,37 @@ struct WatchLumiViewModelTests {
     }
 }
 
+struct WatchLaunchConfigurationTests {
+    @Test func productionDefault() {
+        let config = LaunchConfiguration(arguments: ["/path/to/app"])
+        #expect(config == LaunchConfiguration.production)
+        #expect(config.usesInMemoryStore == false)
+        #expect(config.seed == nil)
+    }
+
+    @Test func uiTestFlagSetsInMemory() {
+        let config = LaunchConfiguration(arguments: ["/path/to/app", "-LumiUITest"])
+        #expect(config.usesInMemoryStore == true)
+        #expect(config.seed == nil)
+    }
+
+    @Test func seedParsed() {
+        let config = LaunchConfiguration(arguments: ["/path/to/app", "-LumiUITest", "-LumiSeed", "42"])
+        #expect(config.usesInMemoryStore == true)
+        #expect(config.seed == 42)
+    }
+
+    @Test func malformedSeedIsNil() {
+        let config = LaunchConfiguration(arguments: ["/path/to/app", "-LumiSeed", "notanumber"])
+        #expect(config.seed == nil)
+    }
+
+    @Test func missingSeedValueIsNil() {
+        let config = LaunchConfiguration(arguments: ["/path/to/app", "-LumiSeed"])
+        #expect(config.seed == nil)
+    }
+}
+
 @MainActor
 struct WatchDependenciesTests {
     @Test func inMemoryDependenciesCreateAndReuseOnePet() async throws {

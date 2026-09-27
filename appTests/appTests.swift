@@ -112,10 +112,51 @@ struct PetRenderPolicyResolverTests {
     }
 }
 
+struct LaunchConfigurationTests {
+    @Test func productionDefault() {
+        let config = LaunchConfiguration(arguments: ["/path/to/app"])
+        #expect(config == LaunchConfiguration.production)
+        #expect(config.usesInMemoryStore == false)
+        #expect(config.seed == nil)
+    }
+
+    @Test func uiTestFlagSetsInMemory() {
+        let config = LaunchConfiguration(arguments: ["/path/to/app", "-LumiUITest"])
+        #expect(config.usesInMemoryStore == true)
+        #expect(config.seed == nil)
+    }
+
+    @Test func seedParsed() {
+        let config = LaunchConfiguration(arguments: ["/path/to/app", "-LumiUITest", "-LumiSeed", "42"])
+        #expect(config.usesInMemoryStore == true)
+        #expect(config.seed == 42)
+    }
+
+    @Test func seedWithoutUITestFlag() {
+        let config = LaunchConfiguration(arguments: ["/path/to/app", "-LumiSeed", "99"])
+        #expect(config.usesInMemoryStore == false)
+        #expect(config.seed == 99)
+    }
+
+    @Test func malformedSeedIsNil() {
+        let config = LaunchConfiguration(arguments: ["/path/to/app", "-LumiSeed", "notanumber"])
+        #expect(config.seed == nil)
+    }
+
+    @Test func missingSeedValueIsNil() {
+        let config = LaunchConfiguration(arguments: ["/path/to/app", "-LumiSeed"])
+        #expect(config.seed == nil)
+    }
+
+    @Test func emptyArguments() {
+        let config = LaunchConfiguration(arguments: [])
+        #expect(config == LaunchConfiguration.production)
+    }
+}
+
 @MainActor
 struct PetSceneFactoryTests {
-    @Test func bundledAtlasAndLayoutLoad() throws {
-        let (catalog, layout) = try PetSceneFactory.loadResources(bundle: .main)
+    @Test func bundledAtlasAndLayoutLoad() throws {        let (catalog, layout) = try PetSceneFactory.loadResources(bundle: .main)
         #expect(catalog.missingTextureNames.isEmpty)
         #expect(layout.version == 1)
     }

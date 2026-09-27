@@ -7,10 +7,14 @@
 //
 
 import SwiftUI
+import Foundation
 
 @main
 struct LumiApp: App {
-    @State private var bootstrap: AppBootstrap = AppBootstrap.make()
+    @State private var bootstrap: AppBootstrap = {
+        let config = LaunchConfiguration(arguments: ProcessInfo.processInfo.arguments)
+        return AppBootstrap.make(inMemory: config.usesInMemoryStore, seed: config.seed)
+    }()
 
     var body: some Scene {
         WindowGroup {
@@ -19,7 +23,8 @@ struct LumiApp: App {
                 ContentView(repository: repository)
             case let .failed(message):
                 LumiErrorView(message: message) {
-                    bootstrap = AppBootstrap.make()
+                    let config = LaunchConfiguration(arguments: ProcessInfo.processInfo.arguments)
+                    bootstrap = AppBootstrap.make(inMemory: config.usesInMemoryStore, seed: config.seed)
                 }
             }
         }

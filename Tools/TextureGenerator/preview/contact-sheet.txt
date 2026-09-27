@@ -1,0 +1,57 @@
+Contact sheet grid order (row-major, 8 cols):
+ 0. body_round
+ 1. body_compact
+ 2. body_pear
+ 3. abdomen_soft
+ 4. paws_round
+ 5. head_base
+ 6. fur_smooth
+ 7. fur_fluffy
+ 8. fur_spiky
+ 9. pattern_spots
+10. pattern_stripes
+11. pattern_socks
+12. pattern_gradient
+13. pattern_mask
+14. eyelid
+15. iris_base
+16. ear_pointed
+17. ear_rounded
+18. ear_long
+19. ear_floppy
+20. tail_short
+21. tail_long
+22. tail_curled
+23. tail_plume
+24. headtuft_curl
+25. headtuft_split
+26. headtuft_windswept
+27. chesttuft_small
+28. chesttuft_layered
+29. chesttuft_cloud
+30. muzzle_small
+31. muzzle_round
+32. muzzle_pronounced
+33. nose_dot
+34. nose_triangle
+35. nose_heart
+36. cheek_blush
+37. cheek_freckles
+38. cheek_glow
+39. magic_glow
+40. magic_sparkles
+41. magic_orbiting_light
+42. fallback_body
+43. fallback_head
+44. fallback_ear
+45. fallback_tail
+46. fallback_paws
+47. eye_round
+48. eye_almond
+49. eye_sleepy
+50. pupil_round
+51. pupil_vertical
+52. pupil_star
+53. eye_catchlight
+54. fallback_eye
+55. shadow_diffuse

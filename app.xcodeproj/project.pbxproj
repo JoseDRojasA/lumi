@@ -6,7 +6,43 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		DF5989EE306897E400D49FD8 /* LumiWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = DF5989ED306897E400D49FD8 /* LumiWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		DF598A0E306897E500D49FD8 /* LumiWatch.app in Resources */ = {isa = PBXBuildFile; fileRef = DF5989E8306897E400D49FD8 /* LumiWatch.app */; };
+		DF598B123068DC0600D49FD8 /* LumiCore in Frameworks */ = {isa = PBXBuildFile; productRef = DF598B113068DC0600D49FD8 /* LumiCore */; };
+		DF598B143068DC0600D49FD8 /* LumiPersistence in Frameworks */ = {isa = PBXBuildFile; productRef = DF598B133068DC0600D49FD8 /* LumiPersistence */; };
+		DF598B163068DC0600D49FD8 /* LumiRendering in Frameworks */ = {isa = PBXBuildFile; productRef = DF598B153068DC0600D49FD8 /* LumiRendering */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
+		DF5989EF306897E400D49FD8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DF8AD49130687E3800A54CF3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DF5989EC306897E400D49FD8;
+			remoteInfo = "LumiWatch Watch App";
+		};
+		DF5989FD306897E500D49FD8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DF8AD49130687E3800A54CF3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DF5989EC306897E400D49FD8;
+			remoteInfo = "LumiWatch Watch App";
+		};
+		DF598A07306897E500D49FD8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DF8AD49130687E3800A54CF3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DF5989EC306897E400D49FD8;
+			remoteInfo = "LumiWatch Watch App";
+		};
+		DF598A0C306897E500D49FD8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DF8AD49130687E3800A54CF3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DF5989E7306897E400D49FD8;
+			remoteInfo = LumiWatch;
+		};
 		DF8AD4AB30687E3A00A54CF3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = DF8AD49130687E3800A54CF3 /* Project object */;
@@ -23,10 +59,28 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		DF598A12306897E600D49FD8 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolder = Product;
+			files = (
+				DF5989EE306897E400D49FD8 /* LumiWatch Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		DF5989E8306897E400D49FD8 /* LumiWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LumiWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DF5989ED306897E400D49FD8 /* LumiWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LumiWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DF5989FC306897E500D49FD8 /* LumiWatch Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "LumiWatch Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DF598A06306897E500D49FD8 /* LumiWatch Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "LumiWatch Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DF8AD49930687E3800A54CF3 /* app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = app.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DF8AD4AA30687E3A00A54CF3 /* appTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = appTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DF8AD4B430687E3A00A54CF3 /* appUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = appUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DF8AD4C93068895F00A54CF3 /* 2026-09-26-lumi-product-definition.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-09-26-lumi-product-definition.md"; sourceTree = "<group>"; };
+		DF8AD4CB30688C7A00A54CF3 /* 2026-09-26-random-lumi.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "2026-09-26-random-lumi.md"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -40,6 +94,21 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		DF5989F1306897E400D49FD8 /* LumiWatch Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "LumiWatch Watch App";
+			sourceTree = "<group>";
+		};
+		DF5989FF306897E500D49FD8 /* LumiWatch Watch AppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "LumiWatch Watch AppTests";
+			sourceTree = "<group>";
+		};
+		DF598A09306897E500D49FD8 /* LumiWatch Watch AppUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "LumiWatch Watch AppUITests";
+			sourceTree = "<group>";
+		};
 		DF8AD49B30687E3800A54CF3 /* app */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -61,9 +130,27 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		DF5989EA306897E400D49FD8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		DF5989F9306897E500D49FD8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		DF598A03306897E500D49FD8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
 		DF8AD49630687E3800A54CF3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				DF598B123068DC0600D49FD8 /* LumiCore in Frameworks */,
+				DF598B163068DC0600D49FD8 /* LumiRendering in Frameworks */,
+				DF598B143068DC0600D49FD8 /* LumiPersistence in Frameworks */,
 			);
 		};
 		DF8AD4A730687E3A00A54CF3 /* Frameworks */ = {
@@ -85,7 +172,11 @@
 				DF8AD49B30687E3800A54CF3 /* app */,
 				DF8AD4AD30687E3A00A54CF3 /* appTests */,
 				DF8AD4B730687E3A00A54CF3 /* appUITests */,
+				DF5989F1306897E400D49FD8 /* LumiWatch Watch App */,
+				DF5989FF306897E500D49FD8 /* LumiWatch Watch AppTests */,
+				DF598A09306897E500D49FD8 /* LumiWatch Watch AppUITests */,
 				DF8AD49A30687E3800A54CF3 /* Products */,
+				DF8AD4C6306888F700A54CF3 /* docs */,
 			);
 			sourceTree = "<group>";
 		};
@@ -95,13 +186,127 @@
 				DF8AD49930687E3800A54CF3 /* app.app */,
 				DF8AD4AA30687E3A00A54CF3 /* appTests.xctest */,
 				DF8AD4B430687E3A00A54CF3 /* appUITests.xctest */,
+				DF5989E8306897E400D49FD8 /* LumiWatch.app */,
+				DF5989ED306897E400D49FD8 /* LumiWatch Watch App.app */,
+				DF5989FC306897E500D49FD8 /* LumiWatch Watch AppTests.xctest */,
+				DF598A06306897E500D49FD8 /* LumiWatch Watch AppUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		DF8AD4C6306888F700A54CF3 /* docs */ = {
+			isa = PBXGroup;
+			children = (
+				DF8AD4C7306888FE00A54CF3 /* superpowers */,
+			);
+			path = docs;
+			sourceTree = "<group>";
+		};
+		DF8AD4C7306888FE00A54CF3 /* superpowers */ = {
+			isa = PBXGroup;
+			children = (
+				DF8AD4C83068890500A54CF3 /* specs */,
+				DF8AD4CA30688BC000A54CF3 /* plans */,
+			);
+			path = superpowers;
+			sourceTree = "<group>";
+		};
+		DF8AD4C83068890500A54CF3 /* specs */ = {
+			isa = PBXGroup;
+			children = (
+				DF8AD4C93068895F00A54CF3 /* 2026-09-26-lumi-product-definition.md */,
+			);
+			path = specs;
+			sourceTree = "<group>";
+		};
+		DF8AD4CA30688BC000A54CF3 /* plans */ = {
+			isa = PBXGroup;
+			children = (
+				DF8AD4CB30688C7A00A54CF3 /* 2026-09-26-random-lumi.md */,
+			);
+			path = plans;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		DF5989E7306897E400D49FD8 /* LumiWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DF598A13306897E600D49FD8 /* Build configuration list for PBXNativeTarget "LumiWatch" */;
+			buildPhases = (
+				DF5989E6306897E400D49FD8 /* Resources */,
+				DF598A12306897E600D49FD8 /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DF5989F0306897E400D49FD8 /* PBXTargetDependency */,
+			);
+			name = LumiWatch;
+			productName = LumiWatch;
+			productReference = DF5989E8306897E400D49FD8 /* LumiWatch.app */;
+			productType = "com.apple.product-type.application.watchapp2-container";
+		};
+		DF5989EC306897E400D49FD8 /* LumiWatch Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DF598A0F306897E600D49FD8 /* Build configuration list for PBXNativeTarget "LumiWatch Watch App" */;
+			buildPhases = (
+				DF5989E9306897E400D49FD8 /* Sources */,
+				DF5989EA306897E400D49FD8 /* Frameworks */,
+				DF5989EB306897E400D49FD8 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				DF5989F1306897E400D49FD8 /* LumiWatch Watch App */,
+			);
+			name = "LumiWatch Watch App";
+			productName = "LumiWatch Watch App";
+			productReference = DF5989ED306897E400D49FD8 /* LumiWatch Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DF5989FB306897E500D49FD8 /* LumiWatch Watch AppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DF598A16306897E600D49FD8 /* Build configuration list for PBXNativeTarget "LumiWatch Watch AppTests" */;
+			buildPhases = (
+				DF5989F8306897E500D49FD8 /* Sources */,
+				DF5989F9306897E500D49FD8 /* Frameworks */,
+				DF5989FA306897E500D49FD8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DF5989FE306897E500D49FD8 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				DF5989FF306897E500D49FD8 /* LumiWatch Watch AppTests */,
+			);
+			name = "LumiWatch Watch AppTests";
+			productName = "LumiWatch Watch AppTests";
+			productReference = DF5989FC306897E500D49FD8 /* LumiWatch Watch AppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		DF598A05306897E500D49FD8 /* LumiWatch Watch AppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DF598A19306897E600D49FD8 /* Build configuration list for PBXNativeTarget "LumiWatch Watch AppUITests" */;
+			buildPhases = (
+				DF598A02306897E500D49FD8 /* Sources */,
+				DF598A03306897E500D49FD8 /* Frameworks */,
+				DF598A04306897E500D49FD8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DF598A08306897E500D49FD8 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				DF598A09306897E500D49FD8 /* LumiWatch Watch AppUITests */,
+			);
+			name = "LumiWatch Watch AppUITests";
+			productName = "LumiWatch Watch AppUITests";
+			productReference = DF598A06306897E500D49FD8 /* LumiWatch Watch AppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		DF8AD49830687E3800A54CF3 /* app */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = DF8AD4BB30687E3A00A54CF3 /* Build configuration list for PBXNativeTarget "app" */;
@@ -112,10 +317,18 @@
 			);
 			buildRules = (
 			);
+			dependencies = (
+				DF598A0D306897E500D49FD8 /* PBXTargetDependency */,
+			);
 			fileSystemSynchronizedGroups = (
 				DF8AD49B30687E3800A54CF3 /* app */,
 			);
 			name = app;
+			packageProductDependencies = (
+				DF598B113068DC0600D49FD8 /* LumiCore */,
+				DF598B133068DC0600D49FD8 /* LumiPersistence */,
+				DF598B153068DC0600D49FD8 /* LumiRendering */,
+			);
 			productName = app;
 			productReference = DF8AD49930687E3800A54CF3 /* app.app */;
 			productType = "com.apple.product-type.application";
@@ -172,6 +385,20 @@
 				LastSwiftUpdateCheck = 2700;
 				LastUpgradeCheck = 2700;
 				TargetAttributes = {
+					DF5989E7306897E400D49FD8 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					DF5989EC306897E400D49FD8 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					DF5989FB306897E500D49FD8 = {
+						CreatedOnToolsVersion = 27.0;
+						TestTargetID = DF5989EC306897E400D49FD8;
+					};
+					DF598A05306897E500D49FD8 = {
+						CreatedOnToolsVersion = 27.0;
+						TestTargetID = DF5989EC306897E400D49FD8;
+					};
 					DF8AD49830687E3800A54CF3 = {
 						CreatedOnToolsVersion = 27.0;
 					};
@@ -194,6 +421,9 @@
 			);
 			mainGroup = DF8AD49030687E3800A54CF3;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				DF598B103068DC0600D49FD8 /* XCLocalSwiftPackageReference "Packages/LumiKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DF8AD49A30687E3800A54CF3 /* Products */;
 			projectDirPath = "";
@@ -202,14 +432,39 @@
 				DF8AD49830687E3800A54CF3 /* app */,
 				DF8AD4A930687E3A00A54CF3 /* appTests */,
 				DF8AD4B330687E3A00A54CF3 /* appUITests */,
+				DF5989E7306897E400D49FD8 /* LumiWatch */,
+				DF5989EC306897E400D49FD8 /* LumiWatch Watch App */,
+				DF5989FB306897E500D49FD8 /* LumiWatch Watch AppTests */,
+				DF598A05306897E500D49FD8 /* LumiWatch Watch AppUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		DF5989E6306897E400D49FD8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		DF5989EB306897E400D49FD8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		DF5989FA306897E500D49FD8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		DF598A04306897E500D49FD8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
 		DF8AD49730687E3800A54CF3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
+				DF598A0E306897E500D49FD8 /* LumiWatch.app in Resources */,
 			);
 		};
 		DF8AD4A830687E3A00A54CF3 /* Resources */ = {
@@ -225,6 +480,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		DF5989E9306897E400D49FD8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		DF5989F8306897E500D49FD8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		DF598A02306897E500D49FD8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 		DF8AD49530687E3800A54CF3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
@@ -243,6 +513,26 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		DF5989F0306897E400D49FD8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DF5989EC306897E400D49FD8 /* LumiWatch Watch App */;
+			targetProxy = DF5989EF306897E400D49FD8 /* PBXContainerItemProxy */;
+		};
+		DF5989FE306897E500D49FD8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DF5989EC306897E400D49FD8 /* LumiWatch Watch App */;
+			targetProxy = DF5989FD306897E500D49FD8 /* PBXContainerItemProxy */;
+		};
+		DF598A08306897E500D49FD8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DF5989EC306897E400D49FD8 /* LumiWatch Watch App */;
+			targetProxy = DF598A07306897E500D49FD8 /* PBXContainerItemProxy */;
+		};
+		DF598A0D306897E500D49FD8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DF5989E7306897E400D49FD8 /* LumiWatch */;
+			targetProxy = DF598A0C306897E500D49FD8 /* PBXContainerItemProxy */;
+		};
 		DF8AD4AC30687E3A00A54CF3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = DF8AD49830687E3800A54CF3 /* app */;
@@ -256,6 +546,198 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		DF598A10306897E600D49FD8 /* Debug configuration for PBXNativeTarget "LumiWatch Watch App" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Lumi;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = heylumipet.app;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = heylumipet.app.LumiWatch.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 27.0;
+			};
+			name = Debug;
+		};
+		DF598A11306897E600D49FD8 /* Release configuration for PBXNativeTarget "LumiWatch Watch App" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Lumi;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = heylumipet.app;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = heylumipet.app.LumiWatch.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 27.0;
+			};
+			name = Release;
+		};
+		DF598A14306897E600D49FD8 /* Debug configuration for PBXNativeTarget "LumiWatch" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9T6DMRVVUY;
+				INFOPLIST_KEY_CFBundleDisplayName = LumiWatch;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = heylumipet.app.LumiWatch;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		DF598A15306897E600D49FD8 /* Release configuration for PBXNativeTarget "LumiWatch" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9T6DMRVVUY;
+				INFOPLIST_KEY_CFBundleDisplayName = LumiWatch;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = heylumipet.app.LumiWatch;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		DF598A17306897E600D49FD8 /* Debug configuration for PBXNativeTarget "LumiWatch Watch AppTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "heylumipet.app.LumiWatch-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LumiWatch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LumiWatch Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 27.0;
+			};
+			name = Debug;
+		};
+		DF598A18306897E600D49FD8 /* Release configuration for PBXNativeTarget "LumiWatch Watch AppTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "heylumipet.app.LumiWatch-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LumiWatch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LumiWatch Watch App";
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 27.0;
+			};
+			name = Release;
+		};
+		DF598A1A306897E600D49FD8 /* Debug configuration for PBXNativeTarget "LumiWatch Watch AppUITests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "heylumipet.app.LumiWatch-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "LumiWatch Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 27.0;
+			};
+			name = Debug;
+		};
+		DF598A1B306897E600D49FD8 /* Release configuration for PBXNativeTarget "LumiWatch Watch AppUITests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "heylumipet.app.LumiWatch-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "LumiWatch Watch App";
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 27.0;
+			};
+			name = Release;
+		};
 		DF8AD4BC30687E3A00A54CF3 /* Debug configuration for PBXNativeTarget "app" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -270,6 +752,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = app/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Lumi;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -290,13 +773,13 @@
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 27.0;
 			};
 			name = Debug;
@@ -315,6 +798,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = app/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Lumi;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -335,13 +819,13 @@
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 27.0;
 			};
 			name = Release;
@@ -567,6 +1051,38 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		DF598A0F306897E600D49FD8 /* Build configuration list for PBXNativeTarget "LumiWatch Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DF598A10306897E600D49FD8 /* Debug configuration for PBXNativeTarget "LumiWatch Watch App" */,
+				DF598A11306897E600D49FD8 /* Release configuration for PBXNativeTarget "LumiWatch Watch App" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		DF598A13306897E600D49FD8 /* Build configuration list for PBXNativeTarget "LumiWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DF598A14306897E600D49FD8 /* Debug configuration for PBXNativeTarget "LumiWatch" */,
+				DF598A15306897E600D49FD8 /* Release configuration for PBXNativeTarget "LumiWatch" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		DF598A16306897E600D49FD8 /* Build configuration list for PBXNativeTarget "LumiWatch Watch AppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DF598A17306897E600D49FD8 /* Debug configuration for PBXNativeTarget "LumiWatch Watch AppTests" */,
+				DF598A18306897E600D49FD8 /* Release configuration for PBXNativeTarget "LumiWatch Watch AppTests" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		DF598A19306897E600D49FD8 /* Build configuration list for PBXNativeTarget "LumiWatch Watch AppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DF598A1A306897E600D49FD8 /* Debug configuration for PBXNativeTarget "LumiWatch Watch AppUITests" */,
+				DF598A1B306897E600D49FD8 /* Release configuration for PBXNativeTarget "LumiWatch Watch AppUITests" */,
+			);
+			defaultConfigurationName = Release;
+		};
 		DF8AD49430687E3800A54CF3 /* Build configuration list for PBXProject "app" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -600,6 +1116,28 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		DF598B103068DC0600D49FD8 /* XCLocalSwiftPackageReference "Packages/LumiKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/LumiKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DF598B113068DC0600D49FD8 /* LumiCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LumiCore;
+		};
+		DF598B133068DC0600D49FD8 /* LumiPersistence */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LumiPersistence;
+		};
+		DF598B153068DC0600D49FD8 /* LumiRendering */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LumiRendering;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = DF8AD49130687E3800A54CF3 /* Project object */;
 	validationLevel = 1;

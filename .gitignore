@@ -1,0 +1,9 @@
+# SwiftPM build output
+.build/
+.swiftpm/
+
+# Xcode per-user state
+xcuserdata/
+
+# Brainstorming companion scratch files
+.superpowers/

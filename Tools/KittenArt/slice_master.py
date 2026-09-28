@@ -26,7 +26,7 @@ centers/sizes into KittenRig.json.
     defaults: ~/Downloads/rig_master.png  Art/Kitten
 """
 import sys, os, math
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter, ImageChops
 
 MASTER = sys.argv[1] if len(sys.argv) > 1 else os.path.expanduser("~/Downloads/rig_master.png")
 OUT = sys.argv[2] if len(sys.argv) > 2 else "Art/Kitten"
@@ -107,55 +107,163 @@ for y in range(NECK, H):
             bd[x, y] = (r, g, b, a)
 save("k_body", body)
 
-# ---- 6. Eye geometry (measured from the master). ----
-L_EYE = (463, 555)   # image coords (y down)
-R_EYE = (769, 553)
-EYE_W, EYE_H = 300, 220   # generous cover for the lid
+# ---- 6. Eye geometry (measured from the master, image coords y-down). ----
+# Per-eye painted bounding boxes (iris + eyeball), with a small margin.
+MARGIN = 10
+EYE_BBOX = {
+    "left":  (326 - MARGIN, 461 - MARGIN, 602 + MARGIN, 651 + MARGIN),
+    "right": (638 - MARGIN, 455 - MARGIN, 903 + MARGIN, 653 + MARGIN),
+}
+EYE_CENTER = {
+    "left":  ((326 + 602) // 2, (461 + 651) // 2),   # (464, 556)
+    "right": ((638 + 903) // 2, (455 + 653) // 2),    # (770, 554)
+}
 
-def sample_fur(cx, cy, dy):
-    # average a small patch of forehead fur above the eye
+def sample_fur_ring(box):
+    """Average fur color just OUTSIDE the eye box (the socket surround)."""
+    x0, y0, x1, y1 = box
     rs = gs = bs = n = 0
-    for yy in range(cy + dy - 8, cy + dy + 8):
-        for xx in range(cx - 20, cx + 20):
-            r, g, b, a = cpx[xx, yy]
-            if a > 200:
-                rs += r; gs += g; bs += b; n += 1
+    for x in range(x0, x1):
+        for yy in (y0 - 12, y1 + 12):
+            if 0 <= yy < H:
+                r, g, b, a = cpx[x, yy]
+                if a > 180 and b >= r - 10:   # prefer lavender, skip pink/dark
+                    rs += r; gs += g; bs += b; n += 1
     if n == 0:
-        return (200, 182, 224, 255)
+        return (205, 188, 236, 255)
     return (rs // n, gs // n, bs // n, 255)
 
-fur_L = sample_fur(*L_EYE, -150)
-fur_R = sample_fur(*R_EYE, -150)
-# The right eye's forehead sample can pick up the pink ear; force both lids to
-# a shared lavender fur tone (average of the two, biased to the lavender left).
-def lav(c):  # is this a lavender (blue-ish) tone, not pink?
-    return c[2] >= c[0]
-if not lav(fur_R):
-    fur_R = fur_L
-if not lav(fur_L):
-    fur_L = fur_R
-print("fur L", fur_L, "fur R", fur_R)
+fur = {side: sample_fur_ring(EYE_BBOX[side]) for side in ("left", "right")}
+print("socket fur", fur)
 
-# ---- 7. LIDS: a fur-colored rounded rect that covers the eye when opaque. ----
-def make_lid(center, fur):
-    lid = blank()
-    d = ImageDraw.Draw(lid)
-    cx, cy = center
-    x0, y0 = cx - EYE_W // 2, cy - EYE_H // 2
-    x1, y1 = cx + EYE_W // 2, cy + EYE_H // 2
-    d.rounded_rectangle([x0, y0, x1, y1], radius=EYE_H // 2, fill=fur)
-    lid = lid.filter(ImageFilter.GaussianBlur(6))
-    return lid
+# ---- 6a. OPEN-EYE SPRITES: cut the painted eye straight out of the reference.
+for side in ("left", "right"):
+    x0, y0, x1, y1 = EYE_BBOX[side]
+    eye = blank(); ed = eye.load()
+    for y in range(max(0, y0), min(H, y1)):
+        for x in range(max(0, x0), min(W, x1)):
+            r, g, b, a = cpx[x, y]
+            if a > 0:
+                ed[x, y] = (r, g, b, a)
+    save(f"k_eye_open_{side}", eye)
 
-save("k_lid_left", make_lid(L_EYE, fur_L))
-save("k_lid_right", make_lid(R_EYE, fur_R))
+# ---- 6b. Re-cut the HEAD with the eye sockets FILLED with fur, so nothing dark
+#          shows behind the (separately layered) open/closed eye sprites.
+head_fill = head.copy(); hf = head_fill.load()
+for side in ("left", "right"):
+    x0, y0, x1, y1 = EYE_BBOX[side]
+    fr, fg, fb, _ = fur[side]
+    cx, cy = EYE_CENTER[side]
+    rx, ry = (x1 - x0) / 2, (y1 - y0) / 2
+    for y in range(max(0, y0), min(H, y1)):
+        for x in range(max(0, x0), min(W, x1)):
+            # elliptical socket, feathered at the rim
+            nx = (x - cx) / rx; ny = (y - cy) / ry
+            d2 = nx * nx + ny * ny
+            if d2 <= 1.15:
+                t = max(0.0, min(1.0, (1.15 - d2) / 0.30))
+                orr, org, orb, ora = hf[x, y]
+                nr = int(fr * t + orr * (1 - t))
+                ng = int(fg * t + org * (1 - t))
+                nb = int(fb * t + orb * (1 - t))
+                hf[x, y] = (nr, ng, nb, max(ora, int(255 * t)))
+save("k_head", head_fill)
 
-# ---- 8. Closed-eye overlays (a soft down-curved lash line for expressions). ----
-def make_closed(center, fur, happy):
+# ---- 7. CLOSED-EYE SPRITES: a reference-styled soft lid that fully covers the
+#         socket. Fur-colored dome + a soft downward-curved dark lash line, sized
+#         The lid is a fur "curtain" the width of the eye whose BOTTOM edge is a
+#         soft eyelid margin (curve + lash). At rest the engine parks it above the
+#         eye; a blink slides it straight down inside an eye-shaped crop mask, so
+#         the eye stays open underneath and the lid progressively covers it —
+#         exactly like a real eyelid closing. See BlinkLidNode.
+LID_TRAVEL = 1.18   # lid height as a fraction of eye height (extra so it fully covers)
+
+def make_lid(side):
+    """Fur eyelid curtain, drawn at the eye position; bottom edge = lid margin."""
+    x0, y0, x1, y1 = EYE_BBOX[side]
+    w = x1 - x0; h = y1 - y0
+    cx, cy = EYE_CENTER[side]
+    fr, fg, fb, _ = fur[side]
+    # CLOSED pose: the curtain covers the whole socket and its leading edge
+    # (lid margin) sits at the BOTTOM of the eye, bowed downward like a real
+    # upper lid. The engine parks it one travel higher when the eye is open.
+    bow = int(h * 0.22)                      # how much the margin bows down
+    top = y0 - 12                            # just above the socket
+    bot = y1 - 10                            # margin lands inside the eye bottom
+    lw, lh = (x1 + 6) - (x0 - 6), bot - top
+
+    # Fur body from the REAL painted forehead fur just above this eye, stretched
+    # to lid height so the lid carries the same texture/lighting as the head.
+    src = char.crop((x0 - 6, max(0, y0 - int(h * 0.55)), x1 + 6, y0 - 6)).convert("RGBA")
+    # Flatten onto the socket fur colour (transparent pixels would turn black),
+    # then replace anything much darker than fur (painted brows, stray strands)
+    # with fur so only soft fur grain remains.
+    base = Image.new("RGBA", src.size, (fr, fg, fb, 255))
+    base.alpha_composite(src)
+    bp = base.load(); fl = (fr + fg + fb) / 3
+    for yy in range(base.height):
+        for xx in range(base.width):
+            r_, g_, b_, _ = bp[xx, yy]
+            if (r_ + g_ + b_) / 3 < fl - 18:
+                bp[xx, yy] = (fr, fg, fb, 255)
+    fur_tex = base.resize((lw, lh), Image.BICUBIC).filter(ImageFilter.GaussianBlur(1.2))
+
+    # Rounded-lid shading: slightly darker toward the margin (lid curving under).
+    shade = Image.new("L", (lw, lh), 0)
+    sd = ImageDraw.Draw(shade)
+    for i in range(lh):
+        t = i / max(1, lh - 1)
+        sd.line([(0, i), (lw, i)], fill=int(70 * max(0.0, t - 0.45) / 0.55))
+    dark = Image.new("RGBA", (lw, lh), (max(0, fr - 60), max(0, fg - 66), max(0, fb - 50), 255))
+    fur_tex = Image.composite(dark, fur_tex, shade)
+
+    im = blank()
+    im.paste(fur_tex, (x0 - 6, top))
+
+    # Lash line tracing the bowed margin — composited ON TOP (never overwrite).
+    lash_layer = blank(); d2 = ImageDraw.Draw(lash_layer)
+    lash = (74, 54, 66, 255)
+    d2.arc([x0 + int(w * 0.04), bot - 2 * bow, x1 - int(w * 0.04), bot - 2],
+           start=15, end=165, fill=lash, width=max(6, h // 22))
+    outer = x0 + int(w * 0.08) if side == "left" else x1 - int(w * 0.08)
+    flick = -13 if side == "left" else 13
+    d2.line([(outer, bot - bow - 4), (outer + flick, bot - bow + 12)], fill=lash, width=max(4, h // 34))
+    lash_layer = lash_layer.filter(ImageFilter.GaussianBlur(0.8))
+    im.alpha_composite(lash_layer)
+
+    # Shape: rectangle + bowed bottom; lightly anti-aliased edge, fully opaque inside.
+    mask = Image.new("L", (W, H), 0)
+    md = ImageDraw.Draw(mask)
+    md.rectangle([x0 - 6, top, x1 + 6, bot - bow], fill=255)
+    md.ellipse([x0 - 6, bot - 2 * bow, x1 + 6, bot + 2], fill=255)
+    mask = mask.filter(ImageFilter.GaussianBlur(1.5))
+    r, g, b, a = im.split()
+    a = ImageChops.multiply(a, mask)
+    return Image.merge("RGBA", (r, g, b, a))
+
+def make_eye_mask(side):
+    """Opaque eye-shaped ellipse: the SKCropNode mask that clips the sliding lid
+    to the eye so it never spills onto the fur."""
+    x0, y0, x1, y1 = EYE_BBOX[side]
+    cx, cy = EYE_CENTER[side]
+    rx, ry = (x1 - x0) / 2 + 2, (y1 - y0) / 2 + 2
+    im = blank(); d = ImageDraw.Draw(im)
+    d.ellipse([cx - rx, cy - ry, cx + rx, cy + ry], fill=(255, 255, 255, 255))
+    return im.filter(ImageFilter.GaussianBlur(6))
+
+save("k_lid_left", make_lid("left"))
+save("k_lid_right", make_lid("right"))
+save("k_eye_mask_left", make_eye_mask("left"))
+save("k_eye_mask_right", make_eye_mask("right"))
+
+# ---- 8. Expression eye overlays (happy ^_^ and a plain closed line), hidden at
+#         rest and shown only by expression triggers. Positioned at eye centers.
+def make_expression(side, happy):
+    cx, cy = EYE_CENTER[side]
+    x0, y0, x1, y1 = EYE_BBOX[side]
+    w = (x1 - x0) // 2 - 20
     im = blank()
     d = ImageDraw.Draw(im)
-    cx, cy = center
-    w = EYE_W // 2 - 20
     dark = (60, 45, 55, 255)
     if happy:   # upward curve (^_^)
         pts = [(cx - w, cy + 12), (cx, cy - 22), (cx + w, cy + 12)]
@@ -164,10 +272,10 @@ def make_closed(center, fur, happy):
     d.line(pts, fill=dark, width=12, joint="curve")
     return im
 
-save("k_eye_happy_left", make_closed(L_EYE, fur_L, True))
-save("k_eye_happy_right", make_closed(R_EYE, fur_R, True))
-save("k_eye_closed_left", make_closed(L_EYE, fur_L, False))
-save("k_eye_closed_right", make_closed(R_EYE, fur_R, False))
+save("k_eye_happy_left", make_expression("left", True))
+save("k_eye_happy_right", make_expression("right", True))
+save("k_eye_closed_left", make_expression("left", False))
+save("k_eye_closed_right", make_expression("right", False))
 
 # ---- 9. Tiny transparent stubs for parts already baked into head/body. ----
 # import.swift crops to painted pixels, so a stub needs a few opaque px placed
@@ -185,7 +293,9 @@ def stub(name, center, size=(8, 8), color=None):
                  cx + size[0] // 2, cy + size[1] // 2], fill=color)
     save(name, im)
 
-# eyes: whites/iris/pupil/catchlights are baked into head -> stubs at eye centers
+L_EYE = EYE_CENTER["left"]
+R_EYE = EYE_CENTER["right"]
+# eye-white/iris/pupil/catchlights now live in the k_eye_open_* sprites -> stubs
 stub("k_eye_white_left", L_EYE, (200, 160))
 stub("k_eye_white_right", R_EYE, (200, 160))
 stub("k_iris", (L_EYE[0], L_EYE[1]), (120, 120))

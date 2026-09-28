@@ -103,7 +103,7 @@ struct KittenRigTests {
         #expect(close(rootPosition(rig.head), try layout.anchorPosition(of: "k_head")))
         #expect(close(rootPosition(rig.tail), try layout.anchorPosition(of: "k_tail")))
         #expect(close(rootPosition(rig.leftEar), try layout.anchorPosition(of: "k_ear_left")))
-        #expect(close(rootPosition(rig.leftEye), try layout.center(of: "k_eye_white_left")))
+        #expect(close(rootPosition(rig.leftEye), try layout.center(of: "k_eye_open_left")))
         #expect(close(rootPosition(rig.nose), try layout.center(of: "k_nose")))
     }
 
@@ -126,13 +126,16 @@ struct KittenRigTests {
         #expect(rightBrow.xScale == -1)
         #expect(abs(rootPosition(rightBrow).x - (-rootPosition(leftBrow).x)) < 0.01)
 
-        // Iris offsets mirror; catchlight offsets keep the same light direction.
+        // Eyes are cut per-side from the reference (each is its own painted
+        // sprite), so they sit on opposite sides of the face centre line.
+        #expect(rootPosition(rig.leftEye).x < 0)
+        #expect(rootPosition(rig.rightEye).x > 0)
+        // Gaze stubs (iris/pupil/catchlight) are present but hidden — the eye
+        // art is a single painted sprite now.
         let leftIris = try #require(rig.leftEye.childNode(withName: "pet.eye.left.iris"))
-        let rightIris = try #require(rig.rightEye.childNode(withName: "pet.eye.right.iris"))
-        #expect(rightIris.position.x == -leftIris.position.x)
-        let leftLight = try #require(rig.leftEye.childNode(withName: "pet.eye.left.catchlight"))
-        let rightLight = try #require(rig.rightEye.childNode(withName: "pet.eye.right.catchlight"))
-        #expect(rightLight.position == leftLight.position)
+        #expect(leftIris.isHidden)
+        // The alpha-driven closed-eye lid exists per side and starts open.
+        #expect(rig.leftEyelid.alpha == 0 && rig.rightEyelid.alpha == 0)
     }
 
     @Test func onlyTheNeutralFaceIsVisible() throws {

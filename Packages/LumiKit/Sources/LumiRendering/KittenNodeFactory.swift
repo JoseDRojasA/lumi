@@ -144,51 +144,70 @@ public struct KittenNodeFactory {
 
     private struct Eye {
         let eye: SKSpriteNode
-        let lid: SKSpriteNode
+        let lid: SKNode
     }
 
-    /// Builds one eye. The iris, pupil and catchlights are painted once, in the
-    /// LEFT eye; the right eye reuses them. Iris and pupil offsets are mirrored
-    /// for the right eye, catchlight offsets are not (the light comes from the
-    /// same side for both eyes).
+    /// Builds one eye as a true two-state sprite pair:
+    /// - `k_eye_open_<side>`: the painted open eye (iris/pupil/catchlight), cut
+    ///   from the reference and placed where it was painted. Visible at rest.
+    /// - `k_lid_<side>`: the painted CLOSED eye, layered directly above the open
+    ///   eye with alpha 0 at rest. The blink controller raises its alpha to 1 to
+    ///   swap the open sprite for the closed one (a real sprite swap/crossfade).
+    ///
+    /// Invisible iris/pupil/catchlight stubs are still attached (under the open
+    /// eye) so `SecondaryMotionController`'s gaze code keeps finding its nodes;
+    /// they carry no visible art now that the eye is a single painted sprite.
     private func makeEye(side: String, in eyes: SKNode, faceParts: inout [String: SKNode]) throws -> Eye {
         let prefix = "pet.eye.\(side)"
-        let isRight = side == "right"
-        let eye = try sprite(prefix, part: "k_eye_white_\(side)", in: eyes, z: 0)
+        let openPart = "k_eye_open_\(side)"
 
-        let leftEyeCenter = try layout.center(of: "k_eye_white_left")
-        func offset(_ part: String, mirror: Bool) throws -> CGPoint {
+        // The open-eye sprite IS the eye node, placed at its painted position.
+        let eye = try sprite(prefix, part: openPart, in: eyes, z: 0)
+
+        // Gaze stubs: positioned at the eye center, invisible (the painted eye
+        // already includes iris/pupil/catchlight). Kept so gaze has live nodes.
+        let eyeCenter = try layout.center(of: openPart)
+        func stub(_ suffix: String, part: String) throws -> SKSpriteNode {
+            let node = try plainSprite("\(prefix).\(suffix)", part: part)
             let c = try layout.center(of: part)
-            let dx = c.x - leftEyeCenter.x
-            let dy = c.y - leftEyeCenter.y
-            return CGPoint(x: isRight && mirror ? -dx : dx, y: dy)
+            node.position = CGPoint(x: c.x - eyeCenter.x, y: c.y - eyeCenter.y)
+            node.isHidden = true
+            return node
         }
 
-        let iris = try plainSprite("\(prefix).iris", part: "k_iris")
-        iris.position = try offset("k_iris", mirror: true)
+        let iris = try stub("iris", part: "k_iris")
         iris.zPosition = 1
         eye.addChild(iris)
 
-        let pupil = try plainSprite("\(prefix).pupil", part: "k_pupil")
-        pupil.position = try offset("k_pupil", mirror: true)
+        let pupil = try stub("pupil", part: "k_pupil")
         pupil.zPosition = 2
         eye.addChild(pupil)
 
-        // The small catchlight rides on the big one so gaze moves both.
-        let catchlight = try plainSprite("\(prefix).catchlight", part: "k_catchlight_big")
-        catchlight.position = try offset("k_catchlight_big", mirror: false)
+        let catchlight = try stub("catchlight", part: "k_catchlight_big")
         catchlight.zPosition = 3
         eye.addChild(catchlight)
 
-        let small = try plainSprite("\(prefix).catchlight.small", part: "k_catchlight_small")
-        let big = try layout.center(of: "k_catchlight_big")
-        let smallCenter = try layout.center(of: "k_catchlight_small")
-        small.position = CGPoint(x: smallCenter.x - big.x, y: smallCenter.y - big.y)
+        let small = try stub("catchlight.small", part: "k_catchlight_small")
         catchlight.addChild(small)
 
-        // Lid: fully covers the eye; the blink controller drives its alpha.
-        let lid = try sprite("\(prefix).lid", part: "k_lid_\(side)", in: eye, z: 4)
-        lid.alpha = 0
+        // Sliding eyelid: a fur curtain clipped to the eye by a crop mask. The
+        // eye stays open underneath; the controller writes `alpha` (0=open,
+        // 1=closed) and the lid slides straight down to cover the eye.
+        let lidSprite = try plainSprite("\(prefix).lid.curtain", part: "k_lid_\(side)")
+        let lidCenter = try layout.center(of: "k_lid_\(side)")
+        // Position (its CLOSED resting place) is the lid's painted offset in eye-local space.
+        lidSprite.position = CGPoint(x: lidCenter.x - eyeCenter.x, y: lidCenter.y - eyeCenter.y)
+
+        let maskSprite = try plainSprite("\(prefix).lid.mask", part: "k_eye_mask_\(side)")
+        let maskCenter = try layout.center(of: "k_eye_mask_\(side)")
+        maskSprite.position = CGPoint(x: maskCenter.x - eyeCenter.x, y: maskCenter.y - eyeCenter.y)
+
+        // Travel = eye height, so at blink 1 the lid fully covers the socket.
+        let travel = try layout.size(of: "k_eye_mask_\(side)").height
+        let lid = BlinkLidNode(lid: lidSprite, mask: maskSprite, travel: travel)
+        lid.name = "\(prefix).lid"
+        lid.zPosition = 4
+        eye.addChild(lid)
 
         // Closed-eye overlays for expressions (hidden in the neutral face).
         for kind in ["happy", "closed"] {

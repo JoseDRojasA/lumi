@@ -64,8 +64,16 @@ See also: `README.md` (layout, commands, iCloud), and the specs/plans under
   painting (`~/Downloads/rig_master.png`) into the structural layers on one 1254²
   canvas, then `Tools/KittenArt/import.swift` builds `app/LumiKitten.atlas` +
   `app/KittenRig.json`. Key decisions:
-  - Face/eyes are painted into `k_head`; **blinking** uses fur-matched `k_lid_*`
-    overlays; eye-white/iris/pupil/catchlight are transparent stubs.
+  - Face is painted into `k_head`; the **eyes are separate always-open sprites**
+    (`k_eye_open_<side>`, cut from the reference). Sockets in `k_head` are
+    fur-filled. **Blink = sliding eyelid** (2026-09-27, supersedes the crossfade):
+    `BlinkLidNode` (an `SKCropNode` masked by `k_eye_mask_<side>`) holds a fur
+    curtain `k_lid_<side>` (texture from the real forehead fur, lash on its
+    bowed bottom edge) that slides straight down over the eye and back up.
+    `SecondaryMotionController` is unchanged: `BlinkLidNode` reinterprets the
+    `alpha` it writes (0…1) as blink amount. Crossfading a closed-eye sprite was
+    rejected because it read as a patch fading in, not an eyelid.
+    Eye-white/iris/pupil/catchlight are transparent hidden stubs (gaze nodes).
   - Tail baked into `k_body` (no independent sway) to avoid a cut seam; `k_tail`
     is a stub, no pivot. `pivotedPartNames` = head + ear only.
   - Head band bottom is feathered and overlaps the body (hidden by z-order).

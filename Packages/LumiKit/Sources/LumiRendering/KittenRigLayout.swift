@@ -36,6 +36,8 @@ public struct KittenRigLayout: Decodable, Equatable, Sendable {
     public static let requiredPartNames: [String] = [
         "k_shadow", "k_tail", "k_body", "k_chest", "k_paw_left", "k_paw_right",
         "k_head", "k_ear_left", "k_hair",
+        "k_eye_open_left", "k_eye_open_right",
+        "k_eye_mask_left", "k_eye_mask_right",
         "k_eye_white_left", "k_eye_white_right", "k_iris", "k_pupil",
         "k_catchlight_big", "k_catchlight_small", "k_lid_left", "k_lid_right",
         "k_brow_left", "k_nose", "k_blush_left",

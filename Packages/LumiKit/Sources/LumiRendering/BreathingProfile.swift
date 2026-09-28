@@ -31,11 +31,18 @@ public struct BreathingProfile: Equatable, Sendable {
     /// Zero disables all secondary motion (used by the watch rig).
     public let secondaryAmplitude: CGFloat
 
-    public init(personality: MotionPersonality, reduceMotion: Bool, includesSecondaryMotion: Bool = true) {
+    /// - Parameter amplitudeScale: per-device boost (e.g. the tiny watch pet
+    ///   needs a larger fractional breath to be visible). Multiplies every amplitude.
+    public init(
+        personality: MotionPersonality,
+        reduceMotion: Bool,
+        includesSecondaryMotion: Bool = true,
+        amplitudeScale: CGFloat = 1.0
+    ) {
         self.duration = Self.duration(for: personality)
 
         // Reduce Motion scales every amplitude by exactly 0.4.
-        let scale: CGFloat = reduceMotion ? 0.4 : 1.0
+        let scale: CGFloat = (reduceMotion ? 0.4 : 1.0) * amplitudeScale
 
         self.abdomenXAmplitude = 0.05 * scale
         self.abdomenYAmplitude = 0.038 * scale

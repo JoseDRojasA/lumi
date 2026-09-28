@@ -88,6 +88,15 @@ See also: `README.md` (layout, commands, iCloud), and the specs/plans under
   **pre-downscaled** kitten atlas (`LumiWatch Watch App/LumiKitten.atlas`,
   0.33×, premultiplied filtering) built by `Tools/KittenArt/make_watch_atlas.py`
   — rerun it after `import.swift`. Full-size textures alias badly at watch size.
+- **Watch motion (2026-09-27, supersedes "watch = breathing only"):** the watch
+  now runs idle activities and secondary breathing (`PetRenderPolicy.
+  includesActivities` / `includesSecondaryBreathing` are true for all tiers)
+  and boosts breathing 1.35× (`breathingAmplitudeScale`) because the pet is
+  physically tiny. Now 60 fps (was 30; the blink looked steppy), magic
+  effects off, paused when wrist-down.
+  `WatchPetSceneHost` starts a rebuilt scene explicitly: on watchOS,
+  `SpriteView.onAppear` does not re-run when the scene is swapped, which left
+  the kitten frozen after the Pastel Kitten tap.
 - **Background keying:** the master already has real alpha, so the slicer keeps
   it and only removes the two enclosed cream pockets (left ear gap, tail curl).
   Keying all near-white punched holes in the white fur highlights, which only

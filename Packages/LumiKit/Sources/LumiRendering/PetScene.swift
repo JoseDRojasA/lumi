@@ -19,13 +19,31 @@ public enum PetRenderPolicy: Equatable, Sendable {
         }
     }
 
+    /// 60 on every tier, including the watch (2026-09-27): at 30 fps the quick
+    /// blink got only ~5 frames and looked steppy. The watch scene still pauses
+    /// when the wrist is down / screen dims, which bounds the battery cost.
     public var preferredFramesPerSecond: Int {
-        self == .watch ? 30 : 60
+        60
     }
 
-    /// Whether the resting breath includes its delayed secondary tier.
+    /// Whether the resting breath includes its delayed secondary tier
+    /// (tuft/cheek follow-through). On for every tier, including the watch:
+    /// without it the watch pet read as lifeless (2026-09-27).
     public var includesSecondaryBreathing: Bool {
-        self != .watch
+        true
+    }
+
+    /// Whether scheduled idle activities (stretch, look-around, wiggle) and
+    /// explicit `play(_:)` calls run. Enabled on the watch too: activities are
+    /// short and occasional, and the scene already pauses when the wrist is down.
+    public var includesActivities: Bool {
+        true
+    }
+
+    /// Multiplier on breathing amplitudes. The watch pet is physically tiny, so
+    /// the same fractional breath moves only a few points; boost it to read.
+    public var breathingAmplitudeScale: CGFloat {
+        self == .watch ? 1.35 : 1.0
     }
 
     /// Whether magic/glow effects animate.
@@ -112,7 +130,8 @@ public final class PetScene: SKScene {
         let breathingProfile = BreathingProfile(
             personality: configuration.motionPersonality,
             reduceMotion: reduceMotion,
-            includesSecondaryMotion: policy.includesSecondaryBreathing
+            includesSecondaryMotion: policy.includesSecondaryBreathing,
+            amplitudeScale: policy.breathingAmplitudeScale
         )
         self.breathing = BreathingController(rig: rig, composer: composer, profile: breathingProfile)
 
@@ -124,13 +143,12 @@ public final class PetScene: SKScene {
             includesEffects: policy.includesEffects
         )
 
-        // Activities layer on top of breathing/secondary. Disabled on tiers
-        // without secondary breathing (e.g. .watch) to keep low-power devices light.
+        // Activities layer on top of breathing/secondary.
         self.activity = ActivityController(
             composer: composer,
             configuration: configuration,
             reduceMotion: reduceMotion,
-            isEnabled: policy.includesSecondaryBreathing
+            isEnabled: policy.includesActivities
         )
 
         // Character bounds computed ONCE at the base pose, excluding magic.
@@ -215,7 +233,8 @@ public final class PetScene: SKScene {
             BreathingProfile(
                 personality: configuration.motionPersonality,
                 reduceMotion: reduceMotion,
-                includesSecondaryMotion: policy.includesSecondaryBreathing
+                includesSecondaryMotion: policy.includesSecondaryBreathing,
+                amplitudeScale: policy.breathingAmplitudeScale
             )
         )
         // Effects availability may change with the policy — update magic.
@@ -329,7 +348,8 @@ public final class PetScene: SKScene {
             BreathingProfile(
                 personality: configuration.motionPersonality,
                 reduceMotion: enabled,
-                includesSecondaryMotion: policy.includesSecondaryBreathing
+                includesSecondaryMotion: policy.includesSecondaryBreathing,
+                amplitudeScale: policy.breathingAmplitudeScale
             )
         )
         secondary.setReduceMotion(enabled)

@@ -230,6 +230,11 @@ struct PetSceneTests {
         let scene = try makeScene(seed: seed, policy: .watch)
         resize(scene, CGSize(width: 198, height: 242))
         #expect(scene.secondaryProfileForTesting.magicPulse == 0)
-        #expect(scene.breathingProfileForTesting.secondaryAmplitude == 0)
+        // The watch keeps the secondary breathing tier and boosts amplitude so
+        // the tiny pet still reads as alive.
+        #expect(scene.breathingProfileForTesting.secondaryAmplitude > 0)
+        let personality = try PetGenerator.generate(seed: seed, version: 1).motionPersonality
+        let phone = BreathingProfile(personality: personality, reduceMotion: false)
+        #expect(scene.breathingProfileForTesting.abdomenXAmplitude > phone.abdomenXAmplitude)
     }
 }

@@ -66,6 +66,10 @@ struct WatchPetSceneHost: View {
                 )
                 .ignoresSafeArea()
                 .accessibilityHidden(true)
+                // New identity per scene: when the scene is rebuilt (e.g. the
+                // Pastel Kitten preset), onAppear must run again to start it.
+                // Without this the swapped-in scene was never started (frozen).
+                .id(ObjectIdentifier(scene))
                 .onAppear {
                     scene.setReduceMotion(reduceMotion)
                     // onChange only fires on transitions; sync with the launch phase.
@@ -100,7 +104,15 @@ struct WatchPetSceneHost: View {
         }
         do {
             let scene = try WatchPetSceneFactory.makeScene(for: pet, appearance: appearance, reduceMotion: reduceMotion)
+            // Stop the outgoing scene and start the new one here rather than
+            // relying on SpriteView.onAppear: on watchOS, swapping the scene
+            // (e.g. the Pastel Kitten preset) does not re-run onAppear, which
+            // left the new pet frozen at its rest pose.
+            if case let .scene(old, _) = built { old.stopAnimation() }
             built = .scene(scene, petID: pet.id)
+            scene.setReduceMotion(reduceMotion)
+            scene.setApplicationActive(scenePhase == .active)
+            scene.startAnimation()
         } catch {
             built = .failed(error.localizedDescription)
         }

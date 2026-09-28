@@ -52,12 +52,14 @@ public struct KittenNodeFactory {
 
         // MARK: Body
         let body = try container("pet.body", at: layout.center(of: "k_body"), in: root, z: 0)
-        _ = try sprite("pet.body.base", part: "k_body", in: body, z: 0)
 
-        // No separate belly layer: the abdomen is an (empty) breathing pivot at
-        // the chest so the composer's abdomen channel still has a node.
+        // The abdomen carries the VISIBLE body sprite so the breathing controller's
+        // abdomen scale channel visibly squashes/stretches the torso each breath.
+        // It is centered on the body so the scale pivots around the torso center.
+        let abdomen = try container("pet.abdomen", at: layout.center(of: "k_body"), in: body, z: 1)
+        _ = try sprite("pet.body.base", part: "k_body", in: abdomen, z: 0)
+
         let chestCenter = try layout.center(of: "k_chest")
-        let abdomen = try container("pet.abdomen", at: chestCenter, in: body, z: 1)
         let chest = try container("pet.chest", at: chestCenter, in: body, z: 3)
         let chestTuft = try sprite("pet.chest.tuft", part: "k_chest", in: chest, z: 0)
 

@@ -20,7 +20,8 @@ final class LumiViewModel {
 
     private(set) var state: State = .loading
     /// Which art the loaded pet is drawn with. Display-only, like `apply(_:)`.
-    private(set) var appearance: PetAppearance = .generated
+    /// Defaults to the hand-painted pastel kitten (the `rig_master` character).
+    private(set) var appearance: PetAppearance = .kitten
 
     private let repository: any PetRepository
     /// A load already in flight; a second `load()` awaits this instead of starting another.
@@ -41,7 +42,19 @@ final class LumiViewModel {
         let task = Task { [repository] in
             do {
                 let pet = try await repository.createPetIfNeeded()
-                self.state = .loaded(pet)
+                // Default to the hand-painted pastel kitten (the rig_master
+                // reference character), drawn with the kitten atlas.
+                let configuration = (try? PetConfigurationValidator.validate(LumiPresets.pastelKitten)) ?? pet.configuration
+                self.state = .loaded(Pet(
+                    id: pet.id,
+                    configuration: configuration,
+                    name: pet.name,
+                    createdAt: pet.createdAt,
+                    updatedAt: pet.updatedAt,
+                    level: pet.level,
+                    experience: pet.experience,
+                    isActive: pet.isActive
+                ))
             } catch {
                 self.state = .failed(error.localizedDescription)
             }

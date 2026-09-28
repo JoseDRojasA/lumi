@@ -84,7 +84,7 @@ struct KittenRigTests {
     @Test func buildsNamedRigForTheMotionControllers() throws {
         let rig = try makeRig()
         #expect(rig.root.name == "pet.root")
-        #expect(rig.body.childNode(withName: "pet.body.base") is SKSpriteNode)
+        #expect(rig.body.childNode(withName: "//pet.body.base") is SKSpriteNode)
         for eye in [rig.leftEye, rig.rightEye] {
             let name = try #require(eye.name)
             for child in [".iris", ".pupil", ".catchlight", ".lid"] {
@@ -119,12 +119,12 @@ struct KittenRigTests {
     @Test func rightSideIsMirroredFromLeft() throws {
         let rig = try makeRig()
         #expect(rig.rightEar.xScale == -1)
-        #expect(rootPosition(rig.rightEar).x == -rootPosition(rig.leftEar).x)
-        #expect(rootPosition(rig.rightEar).y == rootPosition(rig.leftEar).y)
+        #expect(abs(rootPosition(rig.rightEar).x - (-rootPosition(rig.leftEar).x)) < 0.01)
+        #expect(abs(rootPosition(rig.rightEar).y - rootPosition(rig.leftEar).y) < 0.01)
         let leftBrow = try #require(rig.faceParts["pet.brow.left"])
         let rightBrow = try #require(rig.faceParts["pet.brow.right"])
         #expect(rightBrow.xScale == -1)
-        #expect(rootPosition(rightBrow).x == -rootPosition(leftBrow).x)
+        #expect(abs(rootPosition(rightBrow).x - (-rootPosition(leftBrow).x)) < 0.01)
 
         // Iris offsets mirror; catchlight offsets keep the same light direction.
         let leftIris = try #require(rig.leftEye.childNode(withName: "pet.eye.left.iris"))

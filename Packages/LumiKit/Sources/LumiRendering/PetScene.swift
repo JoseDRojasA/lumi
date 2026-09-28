@@ -56,6 +56,7 @@ public final class PetScene: SKScene {
     private let composer: PetMotionComposer
     private let breathing: BreathingController
     private let secondary: SecondaryMotionController
+    private let activity: ActivityController
 
     /// Character bounds at the base pose, in root-local coordinates, EXCLUDING
     /// the magic node (so a large glow halo doesn't shrink the pet).
@@ -68,6 +69,8 @@ public final class PetScene: SKScene {
     public var secondaryElapsedForTesting: TimeInterval { secondary.elapsed }
     public var breathingProfileForTesting: BreathingProfile { breathing.profile }
     public var secondaryProfileForTesting: SecondaryMotionProfile { secondary.profile }
+    public var activityCurrentForTesting: PetActivity? { activity.current }
+    public var activityElapsedForTesting: TimeInterval { activity.elapsed }
 
     // MARK: - Init
 
@@ -119,6 +122,15 @@ public final class PetScene: SKScene {
             configuration: configuration,
             reduceMotion: reduceMotion,
             includesEffects: policy.includesEffects
+        )
+
+        // Activities layer on top of breathing/secondary. Disabled on tiers
+        // without secondary breathing (e.g. .watch) to keep low-power devices light.
+        self.activity = ActivityController(
+            composer: composer,
+            configuration: configuration,
+            reduceMotion: reduceMotion,
+            isEnabled: policy.includesSecondaryBreathing
         )
 
         // Character bounds computed ONCE at the base pose, excluding magic.
@@ -287,7 +299,22 @@ public final class PetScene: SKScene {
         lastUpdateTime = nil
         breathing.stop(on: rig.root)
         secondary.reset()
+        activity.reset()
         composer.apply()
+    }
+
+    // MARK: - Activities
+
+    /// Plays a procedural activity (e.g. `.jump`, `.dance`) immediately,
+    /// interrupting any current activity. Intended for explicit triggers such as
+    /// minigames or debug controls. Layers on top of breathing/idle motion.
+    public func playActivity(_ activity: PetActivity) {
+        self.activity.play(activity)
+    }
+
+    /// Stops any playing activity and returns to scheduled idle motion.
+    public func stopActivity() {
+        activity.stopActivity()
     }
 
     public func setApplicationActive(_ active: Bool) {
@@ -306,6 +333,7 @@ public final class PetScene: SKScene {
             )
         )
         secondary.setReduceMotion(enabled)
+        activity.setReduceMotion(enabled)
     }
 
     // MARK: - Frame loop
@@ -339,6 +367,7 @@ public final class PetScene: SKScene {
         }
         lastUpdateTime = currentTime
         secondary.advance(by: dt)
+        activity.advance(by: dt)
     }
 
     /// SpriteKit invokes `didEvaluateActions()` on the main thread. See

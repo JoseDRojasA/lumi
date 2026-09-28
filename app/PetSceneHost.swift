@@ -94,6 +94,11 @@ struct PetSceneHost: View {
                     .accessibilityLabel(scene.accessibilityDescription)
                     .accessibilityAddTraits(.isImage)
                     .accessibilityIdentifier("lumi.pet")
+
+                #if DEBUG
+                DebugActivityPanel(scene: scene)
+                    .frame(width: size.width, height: size.height, alignment: .top)
+                #endif
             }
             .frame(width: size.width, height: size.height)
         case let .failed(message):

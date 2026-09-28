@@ -29,7 +29,7 @@ public final class BreathingController {
         self.rig = rig
         self.composer = composer
         self.profile = profile
-        self.bodyHeight = (rig.body.childNode(withName: "pet.body.base") as? SKSpriteNode)?.size.height ?? 380
+        self.bodyHeight = (rig.body.childNode(withName: "//pet.body.base") as? SKSpriteNode)?.size.height ?? 380
     }
 
     /// Live-vs-restart semantics: an amplitude change applies on the next frame

@@ -59,7 +59,21 @@ See also: `README.md` (layout, commands, iCloud), and the specs/plans under
   fragmented tail). Slicing one painting avoids this.
 - **Prompt/brief docs:** `Art/Kitten/DALLE_PROMPTS.md`, `Art/Kitten/CHATGPT_BRIEF.md`
   (kept for reference; note their known limitation above).
-- **Status:** the shipping `k_*` atlas is not yet finalized from the reference art.
+- **Status (2026-09-27):** the shipping `k_*` atlas is now **finalized from the
+  reference art**. `Tools/KittenArt/slice_master.py` slices the single master
+  painting (`~/Downloads/rig_master.png`) into the structural layers on one 1254²
+  canvas, then `Tools/KittenArt/import.swift` builds `app/LumiKitten.atlas` +
+  `app/KittenRig.json`. Key decisions:
+  - Face/eyes are painted into `k_head`; **blinking** uses fur-matched `k_lid_*`
+    overlays; eye-white/iris/pupil/catchlight are transparent stubs.
+  - Tail baked into `k_body` (no independent sway) to avoid a cut seam; `k_tail`
+    is a stub, no pivot. `pivotedPartNames` = head + ear only.
+  - Head band bottom is feathered and overlaps the body (hidden by z-order).
+  - Visible body sprite is parented under the `abdomen` container so breathing
+    scale applies to the painted torso.
+- **Default appearance:** the app now launches showing the **kitten**
+  (`LumiViewModel.appearance = .kitten` + `LumiPresets.pastelKitten`), not the
+  procedural Lumi. The "Pastel Kitten" button remains.
 
 ## 4. Motion — procedural "Activity" system (direction, not yet built)
 

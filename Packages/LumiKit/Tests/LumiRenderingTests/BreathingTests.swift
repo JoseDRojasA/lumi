@@ -189,14 +189,14 @@ struct BreathingControllerTests {
 
         let xRatio = rig.abdomen.xScale / rig.base.abdomen.xScale
         let yRatio = rig.abdomen.yScale / rig.base.abdomen.yScale
-        #expect(xRatio >= 1.020 && xRatio <= 1.035)
-        #expect(yRatio >= 1.012 && yRatio <= 1.025)
+        #expect(xRatio >= 1.035 && xRatio <= 1.060)
+        #expect(yRatio >= 1.026 && yRatio <= 1.045)
 
         let chestRise = (rig.chest.position.y - rig.base.chest.position.y) / h
-        #expect(chestRise >= 0.010 && chestRise <= 0.020)
+        #expect(chestRise >= 0.022 && chestRise <= 0.036)
 
         let headRise = (rig.head.position.y - rig.base.head.position.y) / h
-        #expect(headRise >= 0.005 && headRise <= 0.012)
+        #expect(headRise >= 0.014 && headRise <= 0.024)
     }
 
     @Test func completedCycleRestoresExactBase() throws {

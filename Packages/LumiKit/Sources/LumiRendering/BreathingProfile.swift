@@ -37,11 +37,11 @@ public struct BreathingProfile: Equatable, Sendable {
         // Reduce Motion scales every amplitude by exactly 0.4.
         let scale: CGFloat = reduceMotion ? 0.4 : 1.0
 
-        self.abdomenXAmplitude = 0.028 * scale
-        self.abdomenYAmplitude = 0.018 * scale
-        self.chestRise = 0.015 * scale
-        self.headRise = 0.008 * scale
-        self.secondaryAmplitude = includesSecondaryMotion ? (0.006 * scale) : 0
+        self.abdomenXAmplitude = 0.05 * scale
+        self.abdomenYAmplitude = 0.038 * scale
+        self.chestRise = 0.03 * scale
+        self.headRise = 0.02 * scale
+        self.secondaryAmplitude = includesSecondaryMotion ? (0.012 * scale) : 0
     }
 
     private static func duration(for personality: MotionPersonality) -> TimeInterval {

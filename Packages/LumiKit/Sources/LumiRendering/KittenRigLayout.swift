@@ -43,8 +43,10 @@ public struct KittenRigLayout: Decodable, Equatable, Sendable {
         "k_mouth_neutral", "k_mouth_smile", "k_mouth_o", "k_mouth_sad"
     ]
 
-    /// Parts that must define a pivot (they rotate around it).
-    public static let pivotedPartNames: [String] = ["k_tail", "k_ear_left", "k_head"]
+    /// Parts that must define a pivot (they rotate around it). The tail is now
+    /// baked into the body art (no independent sway), so only the head (neck)
+    /// and ear (base) rotate.
+    public static let pivotedPartNames: [String] = ["k_ear_left", "k_head"]
 
     public static func decode(_ data: Data) throws -> KittenRigLayout {
         let layout = try JSONDecoder().decode(KittenRigLayout.self, from: data)

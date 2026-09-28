@@ -1,14 +1,14 @@
 //
 //  LumiPresets.swift
-//  app
+//  LumiCore
 //
 //  Hand-authored trait sets that reproduce specific reference characters,
 //  bypassing the random generator.
 //
 
-import LumiCore
+import Foundation
 
-enum LumiPresets {
+public enum LumiPresets {
     /// The pastel lavender kitten from the character reference sheet:
     /// big head, big round amber eyes, pink pointed ears, a wild head tuft,
     /// a fluffy chest, blush cheeks and a big curled plume tail.
@@ -16,7 +16,7 @@ enum LumiPresets {
     /// Colors are chosen to pass `PetConfigurationValidator` unchanged
     /// (secondary/accent ≥ 0.28 and iris ≥ 0.34 RGB distance from the coat,
     /// nose ≥ 0.28 from the secondary), so the validator does not repaint them.
-    static let pastelKitten = PetConfiguration(
+    public static let pastelKitten = PetConfiguration(
         formatVersion: 1,
         generatorVersion: PetGenerator.currentVersion,
         seed: 0x4C55_4D49_4B49_5454, // "LUMIKITT"; only identifies the preset

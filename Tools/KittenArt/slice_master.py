@@ -37,23 +37,54 @@ W, H = src.size
 px = src.load()
 
 # ---- 1. Background removal: white -> transparent, with a soft edge. ----
+#   Only near-white pixels CONNECTED TO THE IMAGE BORDER are background. The
+#   kitten's own fur highlights are also near-white; keying those out punched
+#   holes that looked fine on the phone's light background but showed as dark
+#   streaks on the watch's dark background.
 def bg_removed(image):
+    """The master already has a real transparent background, so keep its alpha.
+
+    (Keying near-white to transparent used to punch holes in the kitten's white
+    fur highlights: invisible on the phone's light backdrop, dark streaks on the
+    watch's dark one.) The only paper left in the master is a few enclosed warm
+    cream pockets (ear gap, tail curl); remove those: large connected regions of
+    warm (r >> b) near-white, with a soft rim. Fur is cool lavender (b >= r).
+    """
+    from collections import deque
     im = image.copy()
     p = im.load()
     w, h = im.size
+    # The lit right side of the fur is ALSO warm cream, so only look inside the
+    # two known enclosed pockets of the master (left ear gap, tail curl).
+    POCKETS = [(280, 100, 430, 250), (250, 760, 440, 960)]
+    def cream(x, y):
+        if not any(x0 <= x < x1 and y0 <= y < y1 for x0, y0, x1, y1 in POCKETS):
+            return False
+        r, g, b, a = p[x, y]
+        return a > 0 and r > 222 and g > 205 and r - b >= 5
+    seen = bytearray(w * h)
+    pocket = Image.new("L", (w, h), 0); pk = pocket.load()
+    for sy in range(h):
+        for sx in range(w):
+            if seen[sy * w + sx] or not cream(sx, sy):
+                continue
+            comp = []; q = deque([(sx, sy)]); seen[sy * w + sx] = 1
+            while q:
+                x, y = q.popleft(); comp.append((x, y))
+                for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                    if 0 <= nx < w and 0 <= ny < h and not seen[ny * w + nx] and cream(nx, ny):
+                        seen[ny * w + nx] = 1; q.append((nx, ny))
+            if len(comp) > 300:
+                for x, y in comp:
+                    pk[x, y] = 255
+    soft = pocket.filter(ImageFilter.MaxFilter(5)).filter(ImageFilter.GaussianBlur(1.5))
+    sp = soft.load()
     for y in range(h):
         for x in range(w):
-            r, g, b, a = p[x, y]
-            if a == 0:
-                continue
-            # distance from white
-            mn = min(r, g, b)
-            if r > 236 and g > 236 and b > 236:
-                p[x, y] = (r, g, b, 0)
-            elif r > 218 and g > 218 and b > 218:
-                # soft anti-aliased rim: fade alpha by how close to white
-                t = (mn - 218) / (236 - 218)
-                p[x, y] = (r, g, b, int(255 * (1 - t)))
+            v = sp[x, y]
+            if v:
+                r, g, b, a = p[x, y]
+                p[x, y] = (r, g, b, int(a * (255 - v) / 255))
     return im
 
 char = bg_removed(src)

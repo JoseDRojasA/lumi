@@ -15,6 +15,7 @@ import LumiRendering
 
 struct WatchPetSceneHost: View {
     let pet: Pet
+    var appearance: WatchPetAppearance = .generated
 
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -34,6 +35,8 @@ struct WatchPetSceneHost: View {
         .ignoresSafeArea()
         .onAppear { rebuildIfNeeded() }
         .onChange(of: pet.id) { _, _ in rebuildIfNeeded(force: true) }
+        // Same pet, new appearance (e.g. the Pastel Kitten preset was applied).
+        .onChange(of: appearance) { _, _ in rebuildIfNeeded(force: true) }
         .onChange(of: reduceMotion) { _, newValue in
             if case let .scene(scene, _) = built {
                 scene.setReduceMotion(newValue)
@@ -96,7 +99,7 @@ struct WatchPetSceneHost: View {
             return
         }
         do {
-            let scene = try WatchPetSceneFactory.makeScene(for: pet, reduceMotion: reduceMotion)
+            let scene = try WatchPetSceneFactory.makeScene(for: pet, appearance: appearance, reduceMotion: reduceMotion)
             built = .scene(scene, petID: pet.id)
         } catch {
             built = .failed(error.localizedDescription)

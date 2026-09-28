@@ -82,6 +82,16 @@ See also: `README.md` (layout, commands, iCloud), and the specs/plans under
 - **Default appearance:** the app now launches showing the **kitten**
   (`LumiViewModel.appearance = .kitten` + `LumiPresets.pastelKitten`), not the
   procedural Lumi. The "Pastel Kitten" button remains.
+- **Watch (2026-09-27):** the watch app has a "Pastel Kitten" button
+  (`watch.pastelKitten`) that switches to the kitten (`WatchPetAppearance`).
+  `LumiPresets` now lives in `LumiCore` (shared). The watch ships its own
+  **pre-downscaled** kitten atlas (`LumiWatch Watch App/LumiKitten.atlas`,
+  0.33×, premultiplied filtering) built by `Tools/KittenArt/make_watch_atlas.py`
+  — rerun it after `import.swift`. Full-size textures alias badly at watch size.
+- **Background keying:** the master already has real alpha, so the slicer keeps
+  it and only removes the two enclosed cream pockets (left ear gap, tail curl).
+  Keying all near-white punched holes in the white fur highlights, which only
+  showed on dark backgrounds (the watch) as black streaks.
 
 ## 4. Motion — procedural "Activity" system (direction, not yet built)
 

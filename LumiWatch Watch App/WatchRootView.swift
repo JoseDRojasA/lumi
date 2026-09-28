@@ -33,7 +33,18 @@ struct WatchRootView: View {
             case .loading:
                 ProgressView()
             case let .loaded(pet):
-                WatchPetSceneHost(pet: pet)
+                WatchPetSceneHost(pet: pet, appearance: model.appearance)
+                    .overlay(alignment: .bottom) {
+                        if model.appearance != .kitten {
+                            Button("Pastel Kitten", systemImage: "wand.and.stars") {
+                                model.apply(LumiPresets.pastelKitten, appearance: .kitten)
+                            }
+                            .font(.footnote)
+                            .buttonStyle(.borderedProminent)
+                            .controlSize(.small)
+                            .accessibilityIdentifier("watch.pastelKitten")
+                        }
+                    }
             case let .failed(message):
                 WatchErrorView(message: message) {
                     Task { await model.load() }
